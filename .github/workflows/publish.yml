@@ -1,0 +1,50 @@
+# Publishes index.html to GitHub Pages every time the bot uploads it.
+# Publishing through Actions avoids the classic Pages limit of about
+# 10 builds per hour, so the site can update as often as the bot does.
+#
+# Upload and deploy are separate jobs, and the deploy is retried once:
+# GitHub sometimes can't find a just-uploaded page for a few seconds
+# ("No artifacts named github-pages were found"), which failed about
+# half the runs when both were in one job.
+name: Publish results
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# If a newer upload arrives while one is publishing, skip to the newest
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+  publish:
+    needs: upload
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.retry.outputs.page_url || steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+        continue-on-error: true
+
+      - if: steps.deployment.outcome == 'failure'
+        run: sleep 20
+
+      - id: retry
+        if: steps.deployment.outcome == 'failure'
+        uses: actions/deploy-pages@v4
