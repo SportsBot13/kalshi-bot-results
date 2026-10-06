@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="refresh" content="60">
+<title>Sports Trading Bot | Paper Trading Results</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f2f5fa;
+    --surface: #ffffff;
+    --ink: #0f1b2d;
+    --ink-2: #47556b;
+    --muted: #8391a7;
+    --grid: #e7ecf3;
+    --axis: #c8d2e0;
+    --border: rgba(15, 27, 45, 0.08);
+    --accent: #2a78d6;
+    --accent-wash: rgba(42, 120, 214, 0.10);
+    --track: #dbe8fb;
+    --pos: #047857;
+    --pos-tint: #e6f6ef;
+    --neg: #c2362f;
+    --neg-tint: #fdecea;
+    --warning: #f2a516;
+    --critical: #d03b3b;
+    --good: #22c55e;
+    --hover: #f6f8fc;
+    --shadow: 0 1px 2px rgba(15, 27, 45, 0.05), 0 8px 24px rgba(15, 27, 45, 0.05);
+    --band-from: #0d1b36;
+    --band-to: #173a6e;
+    --hero-tint: #eef4fe;
+    --glow-1: rgba(42, 120, 214, 0.10);
+    --glow-2: rgba(124, 92, 230, 0.07);
+    --table-head: #f5f8fc;
+    --tint-blue: rgba(42, 120, 214, 0.12);   --ink-blue: #2a6fc9;
+    --tint-violet: rgba(124, 92, 230, 0.12); --ink-violet: #6a4fd6;
+    --tint-amber: rgba(232, 156, 12, 0.14);  --ink-amber: #b76e00;
+    --tint-slate: rgba(71, 85, 107, 0.12);   --ink-slate: #47556b;
+    --tint-teal: rgba(13, 148, 136, 0.12);   --ink-teal: #0f8a7f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --page: #0a101c;
+      --surface: #111a2b;
+      --ink: #e9eef7;
+      --ink-2: #a8b4c8;
+      --muted: #74829b;
+      --grid: #1c2740;
+      --axis: #2a3954;
+      --border: rgba(255, 255, 255, 0.07);
+      --accent: #4b93ea;
+      --accent-wash: rgba(75, 147, 234, 0.14);
+      --track: #1b2d4a;
+      --pos: #34d399;
+      --pos-tint: rgba(52, 211, 153, 0.12);
+      --neg: #f87171;
+      --neg-tint: rgba(248, 113, 113, 0.12);
+      --hover: #152035;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      --band-from: #0b1428;
+      --band-to: #13284d;
+      --hero-tint: #13223b;
+      --glow-1: rgba(75, 147, 234, 0.10);
+      --glow-2: rgba(140, 110, 240, 0.07);
+      --table-head: #0f182a;
+      --tint-blue: rgba(75, 147, 234, 0.16);   --ink-blue: #7ab3f2;
+      --tint-violet: rgba(150, 125, 245, 0.16); --ink-violet: #b3a1fa;
+      --tint-amber: rgba(245, 175, 50, 0.16);  --ink-amber: #f3be5a;
+      --tint-slate: rgba(168, 180, 200, 0.14); --ink-slate: #b5c0d3;
+      --tint-teal: rgba(45, 212, 191, 0.14);   --ink-teal: #5eead4;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; color: var(--ink);
+    background:
+      radial-gradient(900px 420px at 15% 120px, var(--glow-1), transparent 70%),
+      radial-gradient(800px 420px at 90% 260px, var(--glow-2), transparent 70%),
+      var(--page);
+    background-attachment: fixed;
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .band {
+    background: linear-gradient(120deg, var(--band-from), var(--band-to));
+    color: #ffffff;
+    padding: max(22px, env(safe-area-inset-top)) 0 44px;
+  }
+  .band-inner {
+    max-width: 1120px; margin: 0 auto; padding: 0 16px;
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 14px 16px;
+  }
+  .band .tabs { grid-column: 1 / -1; }
+  .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .logo {
+    width: 38px; height: 38px; border-radius: 10px; flex: none;
+    display: grid; place-items: center; color: #ffffff;
+    background: linear-gradient(135deg, #3b8cf0, #2563c9);
+    box-shadow: 0 4px 12px rgba(37, 99, 201, 0.45);
+  }
+  .band h1 { color: #ffffff; }
+  .band .subtitle { color: rgba(255, 255, 255, 0.68); }
+  .wrap {
+    max-width: 1120px; margin: 0 auto;
+    padding: 0 16px max(32px, env(safe-area-inset-bottom));
+    margin-top: -32px; position: relative;
+    display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px;
+  }
+  h1 { font-size: 22px; font-weight: 650; letter-spacing: -0.01em; margin: 0; }
+  h2 { font-size: 16px; font-weight: 650; margin: 0; letter-spacing: -0.005em; }
+  .subtitle { margin: 2px 0 0; color: var(--ink-2); }
+  .muted { color: var(--muted); }
+  .small { font-size: 12.5px; }
+
+  .status {
+    display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; justify-self: end;
+    border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.85); font-size: 13px;
+  }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255, 255, 255, 0.45); }
+  .status.live .status-dot { background: var(--good); box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25); }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    padding: 22px; box-shadow: var(--shadow); min-width: 0;
+  }
+  .card-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; margin-bottom: 14px; }
+  .card-note { color: var(--muted); font-size: 13px; }
+
+  .hero {
+    display: grid; grid-template-columns: minmax(240px, 1fr) 2fr; gap: 24px; align-items: center;
+    background: linear-gradient(135deg, var(--hero-tint), var(--surface) 55%);
+  }
+  .hero-value { font-size: 52px; font-weight: 650; letter-spacing: -0.02em; line-height: 1.1; margin: 4px 0 6px; }
+  .hero-sub { color: var(--ink-2); display: flex; flex-wrap: wrap; align-items: center; gap: 4px 0; }
+  .dot-sep { width: 3px; height: 3px; border-radius: 50%; background: var(--axis); margin: 0 10px; }
+  .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .stat {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px 16px; min-width: 0;
+  }
+  .stat-top { display: flex; align-items: center; gap: 10px; }
+  .stat-icon { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; flex: none; }
+  .tint-blue { background: var(--tint-blue); color: var(--ink-blue); }
+  .tint-violet { background: var(--tint-violet); color: var(--ink-violet); }
+  .tint-amber { background: var(--tint-amber); color: var(--ink-amber); }
+  .tint-slate { background: var(--tint-slate); color: var(--ink-slate); }
+  .tint-teal { background: var(--tint-teal); color: var(--ink-teal); }
+  .stat-label { color: var(--ink-2); font-size: 13px; }
+  .stat-value { font-size: 22px; font-weight: 650; margin-top: 8px; letter-spacing: -0.01em; }
+  .stat-note { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .meter { height: 6px; border-radius: 3px; background: var(--track); margin-top: 8px; overflow: hidden; }
+  .meter-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #5aa2f2, var(--accent)); }
+  .meter-fill.warning { background: var(--warning); }
+  .meter-fill.critical { background: var(--critical); }
+
+  .pos { color: var(--pos); }
+  .neg { color: var(--neg); }
+
+  .chart { position: relative; height: 260px; outline: none; border-radius: 8px; }
+  .chart:focus-visible { box-shadow: 0 0 0 2px var(--accent); }
+  .chart svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  .chart text { font: 12px system-ui, -apple-system, "Segoe UI", sans-serif; fill: var(--muted); font-variant-numeric: tabular-nums; }
+  .chart .end-label { fill: var(--ink); font-weight: 600; }
+  .tooltip {
+    position: absolute; pointer-events: none; z-index: 2; min-width: 180px; max-width: 260px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 12px; font-size: 13px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  }
+  .tooltip .tip-value { font-size: 16px; font-weight: 650; color: var(--ink); }
+  .tooltip .tip-key { display: inline-block; width: 12px; height: 2px; background: var(--accent); vertical-align: middle; margin-right: 6px; }
+  .tooltip .tip-line { color: var(--ink-2); }
+  .tooltip .tip-date { color: var(--muted); font-size: 12px; margin-top: 4px; }
+  .table-view { margin-top: 12px; }
+  .table-view summary { cursor: pointer; color: var(--ink-2); font-size: 13px; }
+  .table-view .scroll { margin-top: 10px; max-height: 320px; overflow: auto; }
+
+  .filters { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 14px; margin-bottom: 14px; }
+  .filters label { display: grid; gap: 4px; color: var(--muted); font-size: 12px; }
+  .filters select {
+    font: inherit; font-size: 14px; color: var(--ink); background: var(--hover);
+    border: 1px solid var(--border); border-radius: 8px; padding: 7px 30px 7px 10px; min-width: 150px;
+  }
+  .link-button {
+    appearance: none; background: none; border: 0; padding: 8px 4px; font: inherit; font-size: 13px;
+    color: var(--accent); cursor: pointer;
+  }
+  .pager { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; font-size: 13px; }
+  .pager-button {
+    appearance: none; font: inherit; font-size: 13px; color: var(--ink); background: var(--surface);
+    border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; cursor: pointer;
+  }
+  .pager-button:hover:not(:disabled) { background: var(--hover); }
+  .pager-button:disabled { color: var(--muted); cursor: default; opacity: 0.6; }
+  .panel { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .panel[hidden] { display: none; }
+  .panels { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .tabs { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+  .tab {
+    appearance: none; background: none; border: 0; border-bottom: 3px solid transparent;
+    padding: 10px 14px 11px; font: inherit; font-weight: 550; cursor: pointer; white-space: nowrap;
+  }
+  .tabs .tab { color: rgba(255, 255, 255, 0.66); }
+  .tabs .tab:hover { color: #ffffff; }
+  .tabs .tab[aria-selected="true"] { color: #ffffff; border-bottom-color: #6cb0ff; }
+  .tab:focus-visible { outline: 2px solid #6cb0ff; outline-offset: -2px; border-radius: 6px 6px 0 0; }
+  .subtabs {
+    display: inline-flex; justify-self: start; gap: 2px; padding: 4px;
+    border-radius: 12px; background: var(--grid);
+  }
+  .subtabs .tab { border: 0; border-radius: 8px; padding: 7px 20px; color: var(--ink-2); }
+  .subtabs .tab:hover { color: var(--ink); }
+  .subtabs .tab:focus-visible { border-radius: 8px; outline-color: var(--accent); }
+  .subtabs .tab[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(15, 27, 45, 0.12); }
+
+  .scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--grid); white-space: nowrap; vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; border-bottom-color: var(--axis); }
+  thead th { background: var(--table-head); border-bottom: 0; }
+  thead th:first-child { border-radius: 8px 0 0 8px; }
+  thead th:last-child { border-radius: 0 8px 8px 0; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: var(--hover); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .matchup { font-weight: 550; }
+  .rule-id { font-weight: 600; }
+  .rule-desc { color: var(--muted); font-size: 12.5px; max-width: 420px; overflow: hidden; text-overflow: ellipsis; }
+  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; border-radius: 999px; font-size: 12.5px; font-weight: 600; background: var(--grid); color: var(--ink-2); }
+  .badge.win { color: var(--pos); background: var(--pos-tint); }
+  .badge.loss { color: var(--neg); background: var(--neg-tint); }
+  .empty { color: var(--muted); margin: 4px 0; }
+  .empty-state {
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    padding: 22px 12px; text-align: center; color: var(--muted);
+  }
+  .empty-state p { margin: 0; }
+  .empty-icon {
+    width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center;
+    background: var(--tint-blue); color: var(--ink-blue);
+  }
+
+  footer {
+    display: flex; gap: 12px; align-items: flex-start; color: var(--ink-2); font-size: 13px;
+    padding: 14px 16px; border-radius: 12px; background: var(--hover); border: 1px solid var(--border);
+  }
+  .footer-icon { color: var(--ink-slate); flex: none; margin-top: 1px; }
+  footer p { margin: 0 0 6px; }
+
+  @media (max-width: 760px) {
+    .band-inner { grid-template-columns: minmax(0, 1fr); }
+    .status { justify-self: start; }
+    .hero { grid-template-columns: minmax(0, 1fr); }
+    .hero-value { font-size: 44px; }
+    .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .card { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+<header class="band"><div class="band-inner"><div class="brand"><div class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M4 16l5-5 4 4 7-8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><h1>Sports Trading Bot</h1><p class="subtitle">Paper trading results on Kalshi</p></div></div><div class="status" id="status" data-updated="2026-10-11T01:29:18.704606+00:00"><span class="status-dot"></span><span id="status-text">Updated Oct 10, 08:29 PM CDT</span></div><nav class="tabs" role="tablist" aria-label="Sections" data-panels="panels-main"><button type="button" role="tab" class="tab" data-tab="overview" aria-selected="true">Overview</button><button type="button" role="tab" class="tab" data-tab="live" aria-selected="false">Live</button><button type="button" role="tab" class="tab" data-tab="rules" aria-selected="false">Rules</button><button type="button" role="tab" class="tab" data-tab="history" aria-selected="false">History</button></nav></div></header><main class="wrap"><div class="panels" id="panels-main"><div class="panel" role="tabpanel" data-panel="overview"><section class="hero card"><div class="hero-main"><div class="stat-label">Total profit / loss</div><div class="hero-value pos">+$43.95</div><div class="hero-sub"><span class="pos">+5.2% ROI</span><span class="dot-sep"></span>41&ndash;46 record<span class="dot-sep"></span>87 settled bets</div></div><div class="stats"><div class="stat"><div class="stat-top"><span class="stat-icon tint-blue"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="0.6"/></svg></span><div class="stat-label">Win rate</div></div><div class="stat-value ">47.1%</div></div><div class="stat"><div class="stat-top"><span class="stat-icon tint-violet"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg></span><div class="stat-label">Settled today</div></div><div class="stat-value neg">−$51.42</div></div><div class="stat"><div class="stat-top"><span class="stat-icon tint-amber"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8a2 2 0 0 0 0 4v4h16v-4a2 2 0 0 1 0-4V4H4z" transform="translate(0 2)"/><path d="M14 6v12" stroke-dasharray="2 2.5"/></svg></span><div class="stat-label">Open bets</div></div><div class="stat-value ">4</div><div class="stat-note">of 50 allowed</div></div><div class="stat"><div class="stat-top"><span class="stat-icon tint-slate"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/></svg></span><div class="stat-label">Daily risk used</div></div><div class="stat-value ">$90.90</div><div class="meter" role="meter" aria-valuemin="0" aria-valuemax="500" aria-valuenow="90.90" aria-label="Daily risk used"><div class="meter-fill " style="width:18.2%"></div></div><div class="stat-note">of $500 daily limit</div></div></div></section><section class="card"><div class="card-head"><h2>Cumulative profit / loss</h2><span class="card-note">Every settled bet, in the order it settled</span></div><div class="chart" data-source="pnl-data-all" tabindex="0" aria-label="Cumulative profit and loss over time. Use arrow keys to step through bets."><div class="tooltip" hidden></div></div><script type="application/json" id="pnl-data-all">[{"t": "2026-09-26T19:43:36.578011+00:00", "date": "Sep 26, 02:43 PM", "bet": "Virginia Tech vs Boston College", "pnl": 29.14, "cum": 29.14}, {"t": "2026-09-26T19:53:14.841056+00:00", "date": "Sep 26, 02:53 PM", "bet": "Louisville vs Wake Forest", "pnl": -9.55, "cum": 19.59}, {"t": "2026-09-26T23:17:45.077005+00:00", "date": "Sep 26, 06:17 PM", "bet": "Marshall vs Gardner-Webb", "pnl": 18.32, "cum": 37.91}, {"t": "2026-09-27T00:45:05.283584+00:00", "date": "Sep 26, 07:45 PM", "bet": "Penn State vs Wisconsin", "pnl": -9.98, "cum": 27.93}, {"t": "2026-09-27T02:08:33.458787+00:00", "date": "Sep 26, 09:08 PM", "bet": "Arkansas State vs Kennesaw State", "pnl": 15.08, "cum": 43.01}, {"t": "2026-09-27T02:11:06.225727+00:00", "date": "Sep 26, 09:11 PM", "bet": "Philadelphia Flyers vs Washington Capitals", "pnl": -9.98, "cum": 33.03}, {"t": "2026-09-27T02:52:54.394658+00:00", "date": "Sep 26, 09:52 PM", "bet": "Tulane vs Southern Miss", "pnl": 9.16, "cum": 42.19}, {"t": "2026-09-27T02:57:56.068828+00:00", "date": "Sep 26, 09:57 PM", "bet": "Kansas State vs Cincinnati", "pnl": -9.66, "cum": 32.53}, {"t": "2026-09-27T03:35:10.218592+00:00", "date": "Sep 26, 10:35 PM", "bet": "Arizona vs Washington State", "pnl": 11.18, "cum": 43.71}, {"t": "2026-09-27T06:22:42.819245+00:00", "date": "Sep 27, 01:22 AM", "bet": "Air Force vs Nevada", "pnl": 14.24, "cum": 57.95}, {"t": "2026-09-27T06:48:06.704036+00:00", "date": "Sep 27, 01:48 AM", "bet": "Washington vs Minnesota", "pnl": -9.68, "cum": 48.27}, {"t": "2026-09-27T20:16:49.749453+00:00", "date": "Sep 27, 03:16 PM", "bet": "Buffalo Bills vs Los Angeles Chargers", "pnl": 9.16, "cum": 57.43}, {"t": "2026-09-27T20:32:06.280044+00:00", "date": "Sep 27, 03:32 PM", "bet": "Seattle Seahawks vs Washington Commanders", "pnl": -9.87, "cum": 47.56}, {"t": "2026-09-30T04:54:21.913457+00:00", "date": "Sep 29, 11:54 PM", "bet": "Edmonton Oilers vs Vancouver Canucks", "pnl": -9.84, "cum": 37.72}, {"t": "2026-09-30T05:37:13.045914+00:00", "date": "Sep 30, 12:37 AM", "bet": "Maya Joint vs Sinja Kraus", "pnl": -9.82, "cum": 27.9}, {"t": "2026-09-30T07:13:23.692222+00:00", "date": "Sep 30, 02:13 AM", "bet": "Daria Snigur vs Katarzyna Kawa", "pnl": 9.16, "cum": 37.06}, {"t": "2026-10-01T05:12:30.126868+00:00", "date": "Oct 01, 12:12 AM", "bet": "Taylor Fritz vs Jaume Munar", "pnl": -9.59, "cum": 27.47}, {"t": "2026-10-01T05:53:38.336154+00:00", "date": "Oct 01, 12:53 AM", "bet": "Stefanos Tsitsipas vs Tomas Martin Etcheverry", "pnl": 9.16, "cum": 36.63}, {"t": "2026-10-01T11:47:47.705979+00:00", "date": "Oct 01, 06:47 AM", "bet": "Rafael Jodar vs Adolfo Daniel Vallejo", "pnl": -9.82, "cum": 26.81}, {"t": "2026-10-02T05:54:13.445652+00:00", "date": "Oct 02, 12:54 AM", "bet": "Liudmila Samsonova vs Linda Fruhvirtova", "pnl": 20.25, "cum": 47.06}, {"t": "2026-10-02T15:39:33.035427+00:00", "date": "Oct 02, 10:39 AM", "bet": "Novak Djokovic vs Yunchaokete Bu", "pnl": 13.41, "cum": 60.47}, {"t": "2026-10-03T03:30:07.732824+00:00", "date": "Oct 02, 10:30 PM", "bet": "Deportivo Cali vs Alianza Valledupar FC", "pnl": 10.25, "cum": 70.72}, {"t": "2026-10-03T04:45:39.000263+00:00", "date": "Oct 02, 11:45 PM", "bet": "Vegas Golden Knights vs Anaheim Ducks", "pnl": -9.95, "cum": 60.77}, {"t": "2026-10-03T06:02:30.606483+00:00", "date": "Oct 03, 01:02 AM", "bet": "Alex de Minaur vs Quentin Halys", "pnl": 12.38, "cum": 73.15}, {"t": "2026-10-03T08:27:31.749475+00:00", "date": "Oct 03, 03:27 AM", "bet": "Elina Svitolina vs Katerina Siniakova", "pnl": 12.38, "cum": 85.53}, {"t": "2026-10-03T10:08:11.296920+00:00", "date": "Oct 03, 05:08 AM", "bet": "Leylah Fernandez vs Kamilla Rakhimova", "pnl": -9.82, "cum": 75.71}, {"t": "2026-10-03T16:16:15.991432+00:00", "date": "Oct 03, 11:16 AM", "bet": "Almer\u00eda vs Burgos Club de F\u00fatbol", "pnl": 20.25, "cum": 95.96}, {"t": "2026-10-03T19:28:46.035393+00:00", "date": "Oct 03, 02:28 PM", "bet": "Michigan vs Minnesota", "pnl": -9.65, "cum": 86.31}, {"t": "2026-10-03T19:39:22.559788+00:00", "date": "Oct 03, 02:39 PM", "bet": "Houston vs UCF", "pnl": 11.18, "cum": 97.49}, {"t": "2026-10-03T20:13:38.397219+00:00", "date": "Oct 03, 03:13 PM", "bet": "Western Michigan vs Buffalo Bulls", "pnl": 11.21, "cum": 108.7}, {"t": "2026-10-03T21:03:43.045548+00:00", "date": "Oct 03, 04:03 PM", "bet": "Rionegro \u00c1guilas Doradas vs Jaguares de C\u00f3rdoba", "pnl": 13.41, "cum": 122.11}, {"t": "2026-10-03T22:44:13.530729+00:00", "date": "Oct 03, 05:44 PM", "bet": "UMass vs Eastern Michigan", "pnl": -9.95, "cum": 112.16}, {"t": "2026-10-03T22:48:52.338299+00:00", "date": "Oct 03, 05:48 PM", "bet": "Miami (OH) vs Bowling Green", "pnl": -9.56, "cum": 102.6}, {"t": "2026-10-03T23:08:03.206676+00:00", "date": "Oct 03, 06:08 PM", "bet": "Louisville vs NC State", "pnl": -9.84, "cum": 92.76}, {"t": "2026-10-03T23:08:03.308633+00:00", "date": "Oct 03, 06:08 PM", "bet": "Tennessee vs Auburn", "pnl": 9.16, "cum": 101.92}, {"t": "2026-10-03T23:33:38.510383+00:00", "date": "Oct 03, 06:33 PM", "bet": "Illinois vs Purdue", "pnl": -9.84, "cum": 92.08}, {"t": "2026-10-04T00:04:34.903118+00:00", "date": "Oct 03, 07:04 PM", "bet": "Nebraska vs Maryland", "pnl": 3.58, "cum": 95.66}, {"t": "2026-10-04T01:42:46.332499+00:00", "date": "Oct 03, 08:42 PM", "bet": "Buffalo Sabres vs Chicago Blackhawks", "pnl": 14.24, "cum": 109.9}, {"t": "2026-10-04T02:48:03.482000+00:00", "date": "Oct 03, 09:48 PM", "bet": "South Florida vs Temple", "pnl": -9.59, "cum": 100.31}, {"t": "2026-10-04T02:52:21.005706+00:00", "date": "Oct 03, 09:52 PM", "bet": "Minnesota Wild vs Boston Bruins", "pnl": 10.45, "cum": 110.76}, {"t": "2026-10-04T03:03:25.284401+00:00", "date": "Oct 03, 10:03 PM", "bet": "Louisiana vs Arkansas State", "pnl": 7.52, "cum": 118.28}, {"t": "2026-10-04T03:13:02.178292+00:00", "date": "Oct 03, 10:13 PM", "bet": "USC vs Washington", "pnl": 15.08, "cum": 133.36}, {"t": "2026-10-04T04:46:51.444892+00:00", "date": "Oct 03, 11:46 PM", "bet": "Aryna Sabalenka vs Nikola Bartunkova", "pnl": -9.87, "cum": 123.49}, {"t": "2026-10-04T06:23:33.072018+00:00", "date": "Oct 04, 01:23 AM", "bet": "Texas State vs San Diego State", "pnl": -9.84, "cum": 113.65}, {"t": "2026-10-04T09:33:57.782310+00:00", "date": "Oct 04, 04:33 AM", "bet": "Arthur Fils vs Valentin Vacherot", "pnl": -9.84, "cum": 103.81}, {"t": "2026-10-04T16:33:36.076389+00:00", "date": "Oct 04, 11:33 AM", "bet": "Karolina Muchova vs Liudmila Samsonova", "pnl": 9.16, "cum": 112.97}, {"t": "2026-10-04T16:46:15.292941+00:00", "date": "Oct 04, 11:46 AM", "bet": "Indianapolis Colts vs Washington Commanders", "pnl": 9.16, "cum": 122.13}, {"t": "2026-10-04T18:28:31.915743+00:00", "date": "Oct 04, 01:28 PM", "bet": "CD Castell\u00f3n vs AD Ceuta", "pnl": -9.95, "cum": 112.18}, {"t": "2026-10-04T20:16:50.750167+00:00", "date": "Oct 04, 03:16 PM", "bet": "Buffalo Bills vs New England Patriots", "pnl": -9.95, "cum": 102.23}, {"t": "2026-10-04T23:52:44.640663+00:00", "date": "Oct 04, 06:52 PM", "bet": "Kansas City Chiefs vs Las Vegas Raiders", "pnl": 7.52, "cum": 109.75}, {"t": "2026-10-05T03:48:18.068429+00:00", "date": "Oct 04, 10:48 PM", "bet": "Detroit Lions vs Carolina Panthers", "pnl": -9.61, "cum": 100.14}, {"t": "2026-10-05T05:58:09.169132+00:00", "date": "Oct 05, 12:58 AM", "bet": "Iga Swiatek vs Donna Veki\u0107", "pnl": 16.27, "cum": 116.41}, {"t": "2026-10-05T06:47:50.130509+00:00", "date": "Oct 05, 01:47 AM", "bet": "Lorenzo Sonego vs Aziz Dougaz", "pnl": -9.82, "cum": 106.59}, {"t": "2026-10-05T08:12:57.134941+00:00", "date": "Oct 05, 03:12 AM", "bet": "Terence Atmane vs Bernard Tomi\u0107", "pnl": -9.84, "cum": 96.75}, {"t": "2026-10-05T11:17:05.244784+00:00", "date": "Oct 05, 06:17 AM", "bet": "Dalibor Svr\u010dina vs Billy Harris", "pnl": 7.27, "cum": 104.02}, {"t": "2026-10-05T13:02:36.036108+00:00", "date": "Oct 05, 08:02 AM", "bet": "Nishesh Basavareddy vs Kimmer Coppejans", "pnl": -9.82, "cum": 94.2}, {"t": "2026-10-05T13:48:39.346801+00:00", "date": "Oct 05, 08:48 AM", "bet": "Mattia Bellucci vs Elias Ymer", "pnl": 9.16, "cum": 103.36}, {"t": "2026-10-06T05:42:59.317847+00:00", "date": "Oct 06, 12:42 AM", "bet": "Linda Noskova vs Ekaterina Alexandrova", "pnl": -9.76, "cum": 93.6}, {"t": "2026-10-06T07:48:16.157929+00:00", "date": "Oct 06, 02:48 AM", "bet": "Michael Zheng vs Nicolas Mejia", "pnl": -9.93, "cum": 83.67}, {"t": "2026-10-06T09:38:16.956921+00:00", "date": "Oct 06, 04:38 AM", "bet": "Dane Sweeny vs Kimmer Coppejans", "pnl": -10.0, "cum": 73.67}, {"t": "2026-10-07T01:49:57.149599+00:00", "date": "Oct 06, 08:49 PM", "bet": "Toronto Maple Leafs vs Nashville Predators", "pnl": 21.24, "cum": 94.91}, {"t": "2026-10-07T06:23:34.561203+00:00", "date": "Oct 07, 01:23 AM", "bet": "Arthur Gea vs Jaime Faria", "pnl": 18.32, "cum": 113.23}, {"t": "2026-10-07T08:28:12.394383+00:00", "date": "Oct 07, 03:28 AM", "bet": "Coco Gauff vs Elise Mertens", "pnl": -9.68, "cum": 103.55}, {"t": "2026-10-07T08:28:12.556345+00:00", "date": "Oct 07, 03:28 AM", "bet": "Coco Gauff vs Elise Mertens", "pnl": -9.84, "cum": 93.71}, {"t": "2026-10-07T09:03:21.426809+00:00", "date": "Oct 07, 04:03 AM", "bet": "Toma\u0161 Macha\u010d vs Zhizhen Zhang", "pnl": 10.05, "cum": 103.76}, {"t": "2026-10-09T18:54:21.452168+00:00", "date": "Oct 09, 01:54 PM", "bet": "PSV Eindhoven vs SC Heerenveen", "pnl": 1.23, "cum": 104.99}, {"t": "2026-10-09T19:24:21.788228+00:00", "date": "Oct 09, 02:24 PM", "bet": "Borussia Dortmund vs SV Werder Bremen", "pnl": -9.62, "cum": 95.37}, {"t": "2026-10-10T09:58:12.843915+00:00", "date": "Oct 10, 04:58 AM", "bet": "Tomas Martin Etcheverry vs Dalibor Svr\u010dina", "pnl": -9.75, "cum": 85.62}, {"t": "2026-10-10T15:34:39.848972+00:00", "date": "Oct 10, 10:34 AM", "bet": "TSG Hoffenheim vs Hamburger SV", "pnl": -9.76, "cum": 75.86}, {"t": "2026-10-10T15:39:39.694173+00:00", "date": "Oct 10, 10:39 AM", "bet": "Arsenal vs Leeds United", "pnl": -9.76, "cum": 66.1}, {"t": "2026-10-10T15:41:17.635909+00:00", "date": "Oct 10, 10:41 AM", "bet": "Arsenal vs Leeds United", "pnl": 8.28, "cum": 74.38}, {"t": "2026-10-10T19:14:43.156135+00:00", "date": "Oct 10, 02:14 PM", "bet": "Army vs Tulane", "pnl": 6.28, "cum": 80.66}, {"t": "2026-10-10T19:41:59.690431+00:00", "date": "Oct 10, 02:41 PM", "bet": "Indiana vs Nebraska", "pnl": 13.18, "cum": 93.84}, {"t": "2026-10-10T19:41:59.795763+00:00", "date": "Oct 10, 02:41 PM", "bet": "Indiana vs Nebraska", "pnl": 13.18, "cum": 107.02}, {"t": "2026-10-10T19:55:06.452438+00:00", "date": "Oct 10, 02:55 PM", "bet": "Real Madrid vs Villarreal", "pnl": -9.59, "cum": 97.43}, {"t": "2026-10-10T19:55:06.584671+00:00", "date": "Oct 10, 02:55 PM", "bet": "AFC Ajax vs NEC Nijmegen", "pnl": -9.63, "cum": 87.8}, {"t": "2026-10-10T20:01:23.122017+00:00", "date": "Oct 10, 03:01 PM", "bet": "FC Twente vs Fortuna Sittard", "pnl": -9.85, "cum": 77.95}, {"t": "2026-10-10T20:43:51.091833+00:00", "date": "Oct 10, 03:43 PM", "bet": "Florida vs South Carolina", "pnl": -9.66, "cum": 68.29}, {"t": "2026-10-10T21:54:07.913068+00:00", "date": "Oct 10, 04:54 PM", "bet": "Vasco da Gama vs Remo", "pnl": -9.68, "cum": 58.61}, {"t": "2026-10-10T22:58:43.983200+00:00", "date": "Oct 10, 05:58 PM", "bet": "Eastern Michigan vs Akron", "pnl": 7.35, "cum": 65.96}, {"t": "2026-10-10T22:58:44.089681+00:00", "date": "Oct 10, 05:58 PM", "bet": "Toledo vs Buffalo Bulls", "pnl": -9.78, "cum": 56.18}, {"t": "2026-10-10T23:03:07.962284+00:00", "date": "Oct 10, 06:03 PM", "bet": "Duke vs Georgia Tech", "pnl": -9.5, "cum": 46.68}, {"t": "2026-10-10T23:23:13.252084+00:00", "date": "Oct 10, 06:23 PM", "bet": "Oregon vs UCLA", "pnl": -9.65, "cum": 37.03}, {"t": "2026-10-10T23:23:13.375651+00:00", "date": "Oct 10, 06:23 PM", "bet": "Oregon vs UCLA", "pnl": -9.65, "cum": 27.38}, {"t": "2026-10-10T23:37:50.917151+00:00", "date": "Oct 10, 06:37 PM", "bet": "Tennessee vs Arkansas", "pnl": 11.18, "cum": 38.56}, {"t": "2026-10-10T23:37:51.027095+00:00", "date": "Oct 10, 06:37 PM", "bet": "Texas vs Oklahoma", "pnl": -9.95, "cum": 28.61}, {"t": "2026-10-11T00:33:21.296662+00:00", "date": "Oct 10, 07:33 PM", "bet": "Philadelphia Union vs Real Salt Lake", "pnl": 15.34, "cum": 43.95}]</script><details class="table-view"><summary>View as table</summary><div class="scroll"><table><thead><tr><th>Settled</th><th>Bet</th><th class="num">P/L</th><th class="num">Running total</th></tr></thead><tbody><tr><td>Oct 10, 07:33 PM</td><td>Philadelphia Union vs Real Salt Lake</td><td class="num pos">+$15.34</td><td class="num">+$43.95</td></tr><tr><td>Oct 10, 06:37 PM</td><td>Texas vs Oklahoma</td><td class="num neg">−$9.95</td><td class="num">+$28.61</td></tr><tr><td>Oct 10, 06:37 PM</td><td>Tennessee vs Arkansas</td><td class="num pos">+$11.18</td><td class="num">+$38.56</td></tr><tr><td>Oct 10, 06:23 PM</td><td>Oregon vs UCLA</td><td class="num neg">−$9.65</td><td class="num">+$27.38</td></tr><tr><td>Oct 10, 06:23 PM</td><td>Oregon vs UCLA</td><td class="num neg">−$9.65</td><td class="num">+$37.03</td></tr><tr><td>Oct 10, 06:03 PM</td><td>Duke vs Georgia Tech</td><td class="num neg">−$9.50</td><td class="num">+$46.68</td></tr><tr><td>Oct 10, 05:58 PM</td><td>Toledo vs Buffalo Bulls</td><td class="num neg">−$9.78</td><td class="num">+$56.18</td></tr><tr><td>Oct 10, 05:58 PM</td><td>Eastern Michigan vs Akron</td><td class="num pos">+$7.35</td><td class="num">+$65.96</td></tr><tr><td>Oct 10, 04:54 PM</td><td>Vasco da Gama vs Remo</td><td class="num neg">−$9.68</td><td class="num">+$58.61</td></tr><tr><td>Oct 10, 03:43 PM</td><td>Florida vs South Carolina</td><td class="num neg">−$9.66</td><td class="num">+$68.29</td></tr><tr><td>Oct 10, 03:01 PM</td><td>FC Twente vs Fortuna Sittard</td><td class="num neg">−$9.85</td><td class="num">+$77.95</td></tr><tr><td>Oct 10, 02:55 PM</td><td>AFC Ajax vs NEC Nijmegen</td><td class="num neg">−$9.63</td><td class="num">+$87.80</td></tr><tr><td>Oct 10, 02:55 PM</td><td>Real Madrid vs Villarreal</td><td class="num neg">−$9.59</td><td class="num">+$97.43</td></tr><tr><td>Oct 10, 02:41 PM</td><td>Indiana vs Nebraska</td><td class="num pos">+$13.18</td><td class="num">+$107.02</td></tr><tr><td>Oct 10, 02:41 PM</td><td>Indiana vs Nebraska</td><td class="num pos">+$13.18</td><td class="num">+$93.84</td></tr><tr><td>Oct 10, 02:14 PM</td><td>Army vs Tulane</td><td class="num pos">+$6.28</td><td class="num">+$80.66</td></tr><tr><td>Oct 10, 10:41 AM</td><td>Arsenal vs Leeds United</td><td class="num pos">+$8.28</td><td class="num">+$74.38</td></tr><tr><td>Oct 10, 10:39 AM</td><td>Arsenal vs Leeds United</td><td class="num neg">−$9.76</td><td class="num">+$66.10</td></tr><tr><td>Oct 10, 10:34 AM</td><td>TSG Hoffenheim vs Hamburger SV</td><td class="num neg">−$9.76</td><td class="num">+$75.86</td></tr><tr><td>Oct 10, 04:58 AM</td><td>Tomas Martin Etcheverry vs Dalibor Svrčina</td><td class="num neg">−$9.75</td><td class="num">+$85.62</td></tr><tr><td>Oct 09, 02:24 PM</td><td>Borussia Dortmund vs SV Werder Bremen</td><td class="num neg">−$9.62</td><td class="num">+$95.37</td></tr><tr><td>Oct 09, 01:54 PM</td><td>PSV Eindhoven vs SC Heerenveen</td><td class="num pos">+$1.23</td><td class="num">+$104.99</td></tr><tr><td>Oct 07, 04:03 AM</td><td>Tomaš Machač vs Zhizhen Zhang</td><td class="num pos">+$10.05</td><td class="num">+$103.76</td></tr><tr><td>Oct 07, 03:28 AM</td><td>Coco Gauff vs Elise Mertens</td><td class="num neg">−$9.84</td><td class="num">+$93.71</td></tr><tr><td>Oct 07, 03:28 AM</td><td>Coco Gauff vs Elise Mertens</td><td class="num neg">−$9.68</td><td class="num">+$103.55</td></tr><tr><td>Oct 07, 01:23 AM</td><td>Arthur Gea vs Jaime Faria</td><td class="num pos">+$18.32</td><td class="num">+$113.23</td></tr><tr><td>Oct 06, 08:49 PM</td><td>Toronto Maple Leafs vs Nashville Predators</td><td class="num pos">+$21.24</td><td class="num">+$94.91</td></tr><tr><td>Oct 06, 04:38 AM</td><td>Dane Sweeny vs Kimmer Coppejans</td><td class="num neg">−$10.00</td><td class="num">+$73.67</td></tr><tr><td>Oct 06, 02:48 AM</td><td>Michael Zheng vs Nicolas Mejia</td><td class="num neg">−$9.93</td><td class="num">+$83.67</td></tr><tr><td>Oct 06, 12:42 AM</td><td>Linda Noskova vs Ekaterina Alexandrova</td><td class="num neg">−$9.76</td><td class="num">+$93.60</td></tr><tr><td>Oct 05, 08:48 AM</td><td>Mattia Bellucci vs Elias Ymer</td><td class="num pos">+$9.16</td><td class="num">+$103.36</td></tr><tr><td>Oct 05, 08:02 AM</td><td>Nishesh Basavareddy vs Kimmer Coppejans</td><td class="num neg">−$9.82</td><td class="num">+$94.20</td></tr><tr><td>Oct 05, 06:17 AM</td><td>Dalibor Svrčina vs Billy Harris</td><td class="num pos">+$7.27</td><td class="num">+$104.02</td></tr><tr><td>Oct 05, 03:12 AM</td><td>Terence Atmane vs Bernard Tomić</td><td class="num neg">−$9.84</td><td class="num">+$96.75</td></tr><tr><td>Oct 05, 01:47 AM</td><td>Lorenzo Sonego vs Aziz Dougaz</td><td class="num neg">−$9.82</td><td class="num">+$106.59</td></tr><tr><td>Oct 05, 12:58 AM</td><td>Iga Swiatek vs Donna Vekić</td><td class="num pos">+$16.27</td><td class="num">+$116.41</td></tr><tr><td>Oct 04, 10:48 PM</td><td>Detroit Lions vs Carolina Panthers</td><td class="num neg">−$9.61</td><td class="num">+$100.14</td></tr><tr><td>Oct 04, 06:52 PM</td><td>Kansas City Chiefs vs Las Vegas Raiders</td><td class="num pos">+$7.52</td><td class="num">+$109.75</td></tr><tr><td>Oct 04, 03:16 PM</td><td>Buffalo Bills vs New England Patriots</td><td class="num neg">−$9.95</td><td class="num">+$102.23</td></tr><tr><td>Oct 04, 01:28 PM</td><td>CD Castellón vs AD Ceuta</td><td class="num neg">−$9.95</td><td class="num">+$112.18</td></tr><tr><td>Oct 04, 11:46 AM</td><td>Indianapolis Colts vs Washington Commanders</td><td class="num pos">+$9.16</td><td class="num">+$122.13</td></tr><tr><td>Oct 04, 11:33 AM</td><td>Karolina Muchova vs Liudmila Samsonova</td><td class="num pos">+$9.16</td><td class="num">+$112.97</td></tr><tr><td>Oct 04, 04:33 AM</td><td>Arthur Fils vs Valentin Vacherot</td><td class="num neg">−$9.84</td><td class="num">+$103.81</td></tr><tr><td>Oct 04, 01:23 AM</td><td>Texas State vs San Diego State</td><td class="num neg">−$9.84</td><td class="num">+$113.65</td></tr><tr><td>Oct 03, 11:46 PM</td><td>Aryna Sabalenka vs Nikola Bartunkova</td><td class="num neg">−$9.87</td><td class="num">+$123.49</td></tr><tr><td>Oct 03, 10:13 PM</td><td>USC vs Washington</td><td class="num pos">+$15.08</td><td class="num">+$133.36</td></tr><tr><td>Oct 03, 10:03 PM</td><td>Louisiana vs Arkansas State</td><td class="num pos">+$7.52</td><td class="num">+$118.28</td></tr><tr><td>Oct 03, 09:52 PM</td><td>Minnesota Wild vs Boston Bruins</td><td class="num pos">+$10.45</td><td class="num">+$110.76</td></tr><tr><td>Oct 03, 09:48 PM</td><td>South Florida vs Temple</td><td class="num neg">−$9.59</td><td class="num">+$100.31</td></tr><tr><td>Oct 03, 08:42 PM</td><td>Buffalo Sabres vs Chicago Blackhawks</td><td class="num pos">+$14.24</td><td class="num">+$109.90</td></tr><tr><td>Oct 03, 07:04 PM</td><td>Nebraska vs Maryland</td><td class="num pos">+$3.58</td><td class="num">+$95.66</td></tr><tr><td>Oct 03, 06:33 PM</td><td>Illinois vs Purdue</td><td class="num neg">−$9.84</td><td class="num">+$92.08</td></tr><tr><td>Oct 03, 06:08 PM</td><td>Tennessee vs Auburn</td><td class="num pos">+$9.16</td><td class="num">+$101.92</td></tr><tr><td>Oct 03, 06:08 PM</td><td>Louisville vs NC State</td><td class="num neg">−$9.84</td><td class="num">+$92.76</td></tr><tr><td>Oct 03, 05:48 PM</td><td>Miami (OH) vs Bowling Green</td><td class="num neg">−$9.56</td><td class="num">+$102.60</td></tr><tr><td>Oct 03, 05:44 PM</td><td>UMass vs Eastern Michigan</td><td class="num neg">−$9.95</td><td class="num">+$112.16</td></tr><tr><td>Oct 03, 04:03 PM</td><td>Rionegro Águilas Doradas vs Jaguares de Córdoba</td><td class="num pos">+$13.41</td><td class="num">+$122.11</td></tr><tr><td>Oct 03, 03:13 PM</td><td>Western Michigan vs Buffalo Bulls</td><td class="num pos">+$11.21</td><td class="num">+$108.70</td></tr><tr><td>Oct 03, 02:39 PM</td><td>Houston vs UCF</td><td class="num pos">+$11.18</td><td class="num">+$97.49</td></tr><tr><td>Oct 03, 02:28 PM</td><td>Michigan vs Minnesota</td><td class="num neg">−$9.65</td><td class="num">+$86.31</td></tr><tr><td>Oct 03, 11:16 AM</td><td>Almería vs Burgos Club de Fútbol</td><td class="num pos">+$20.25</td><td class="num">+$95.96</td></tr><tr><td>Oct 03, 05:08 AM</td><td>Leylah Fernandez vs Kamilla Rakhimova</td><td class="num neg">−$9.82</td><td class="num">+$75.71</td></tr><tr><td>Oct 03, 03:27 AM</td><td>Elina Svitolina vs Katerina Siniakova</td><td class="num pos">+$12.38</td><td class="num">+$85.53</td></tr><tr><td>Oct 03, 01:02 AM</td><td>Alex de Minaur vs Quentin Halys</td><td class="num pos">+$12.38</td><td class="num">+$73.15</td></tr><tr><td>Oct 02, 11:45 PM</td><td>Vegas Golden Knights vs Anaheim Ducks</td><td class="num neg">−$9.95</td><td class="num">+$60.77</td></tr><tr><td>Oct 02, 10:30 PM</td><td>Deportivo Cali vs Alianza Valledupar FC</td><td class="num pos">+$10.25</td><td class="num">+$70.72</td></tr><tr><td>Oct 02, 10:39 AM</td><td>Novak Djokovic vs Yunchaokete Bu</td><td class="num pos">+$13.41</td><td class="num">+$60.47</td></tr><tr><td>Oct 02, 12:54 AM</td><td>Liudmila Samsonova vs Linda Fruhvirtova</td><td class="num pos">+$20.25</td><td class="num">+$47.06</td></tr><tr><td>Oct 01, 06:47 AM</td><td>Rafael Jodar vs Adolfo Daniel Vallejo</td><td class="num neg">−$9.82</td><td class="num">+$26.81</td></tr><tr><td>Oct 01, 12:53 AM</td><td>Stefanos Tsitsipas vs Tomas Martin Etcheverry</td><td class="num pos">+$9.16</td><td class="num">+$36.63</td></tr><tr><td>Oct 01, 12:12 AM</td><td>Taylor Fritz vs Jaume Munar</td><td class="num neg">−$9.59</td><td class="num">+$27.47</td></tr><tr><td>Sep 30, 02:13 AM</td><td>Daria Snigur vs Katarzyna Kawa</td><td class="num pos">+$9.16</td><td class="num">+$37.06</td></tr><tr><td>Sep 30, 12:37 AM</td><td>Maya Joint vs Sinja Kraus</td><td class="num neg">−$9.82</td><td class="num">+$27.90</td></tr><tr><td>Sep 29, 11:54 PM</td><td>Edmonton Oilers vs Vancouver Canucks</td><td class="num neg">−$9.84</td><td class="num">+$37.72</td></tr><tr><td>Sep 27, 03:32 PM</td><td>Seattle Seahawks vs Washington Commanders</td><td class="num neg">−$9.87</td><td class="num">+$47.56</td></tr><tr><td>Sep 27, 03:16 PM</td><td>Buffalo Bills vs Los Angeles Chargers</td><td class="num pos">+$9.16</td><td class="num">+$57.43</td></tr><tr><td>Sep 27, 01:48 AM</td><td>Washington vs Minnesota</td><td class="num neg">−$9.68</td><td class="num">+$48.27</td></tr><tr><td>Sep 27, 01:22 AM</td><td>Air Force vs Nevada</td><td class="num pos">+$14.24</td><td class="num">+$57.95</td></tr><tr><td>Sep 26, 10:35 PM</td><td>Arizona vs Washington State</td><td class="num pos">+$11.18</td><td class="num">+$43.71</td></tr><tr><td>Sep 26, 09:57 PM</td><td>Kansas State vs Cincinnati</td><td class="num neg">−$9.66</td><td class="num">+$32.53</td></tr><tr><td>Sep 26, 09:52 PM</td><td>Tulane vs Southern Miss</td><td class="num pos">+$9.16</td><td class="num">+$42.19</td></tr><tr><td>Sep 26, 09:11 PM</td><td>Philadelphia Flyers vs Washington Capitals</td><td class="num neg">−$9.98</td><td class="num">+$33.03</td></tr><tr><td>Sep 26, 09:08 PM</td><td>Arkansas State vs Kennesaw State</td><td class="num pos">+$15.08</td><td class="num">+$43.01</td></tr><tr><td>Sep 26, 07:45 PM</td><td>Penn State vs Wisconsin</td><td class="num neg">−$9.98</td><td class="num">+$27.93</td></tr><tr><td>Sep 26, 06:17 PM</td><td>Marshall vs Gardner-Webb</td><td class="num pos">+$18.32</td><td class="num">+$37.91</td></tr><tr><td>Sep 26, 02:53 PM</td><td>Louisville vs Wake Forest</td><td class="num neg">−$9.55</td><td class="num">+$19.59</td></tr><tr><td>Sep 26, 02:43 PM</td><td>Virginia Tech vs Boston College</td><td class="num pos">+$29.14</td><td class="num">+$29.14</td></tr></tbody></table></div></details></section></div><div class="panel" role="tabpanel" data-panel="live" hidden><section class="card"><div class="card-head"><h2>Open bets</h2></div><div class="scroll"><table><thead><tr><th class="">Team</th><th class="">Sport</th><th class="">Rule</th><th class="num">Pregame &rarr; live</th><th class="num">Price</th><th class="num">Cost</th><th class="num">Pays if win</th></tr></thead><tbody><tr><td><div class="matchup">LSU</div><div class="muted small">vs Kentucky</div></td><td>NCAAF</td><td>R002-v2</td><td class="num">−350 &rarr; +100</td><td class="num">59&cent;</td><td class="num">$9.72</td><td class="num">$16.00</td></tr><tr><td><div class="matchup">Colorado Avalanche</div><div class="muted small">vs Toronto Maple Leafs</div></td><td>NHL</td><td>R005-v2</td><td class="num">−220 &rarr; +176</td><td class="num">36&cent;</td><td class="num">$9.78</td><td class="num">$26.00</td></tr><tr><td><div class="matchup">Virginia</div><div class="muted small">vs Syracuse</div></td><td>NCAAF</td><td>R018-v1</td><td class="num">−650 &rarr; +100</td><td class="num">57&cent;</td><td class="num">$9.99</td><td class="num">$17.00</td></tr><tr><td><div class="matchup">Virginia</div><div class="muted small">vs Syracuse</div></td><td>NCAAF</td><td>R002-v2</td><td class="num">−650 &rarr; +100</td><td class="num">57&cent;</td><td class="num">$9.99</td><td class="num">$17.00</td></tr></tbody></table></div></section><section class="card"><div class="card-head"><h2>Live games</h2><span class="card-note">In progress, with pregame odds locked</span></div><div class="scroll"><table><thead><tr><th class="">Sport</th><th class="">Team</th><th class="num">Pregame</th><th class="num">Live</th><th class="">Period</th></tr></thead><tbody><tr><td>NCAAF</td><td class="matchup">UAB</td><td class="num">+490</td><td class="num">+1200</td><td>3rd</td></tr><tr><td>NCAAF</td><td class="matchup">Memphis</td><td class="num">−710</td><td class="num">−4500</td><td>3rd</td></tr><tr><td>NHL</td><td class="matchup">Detroit Red Wings</td><td class="num">+152</td><td class="num">+118</td><td>3rd</td></tr><tr><td>NHL</td><td class="matchup">Montréal Canadiens</td><td class="num">−184</td><td class="num">−150</td><td>3rd</td></tr><tr><td>NCAAF</td><td class="matchup">LSU</td><td class="num">−350</td><td class="num">−150</td><td>3rd</td></tr><tr><td>NCAAF</td><td class="matchup">Kentucky</td><td class="num">+275</td><td class="num">+118</td><td>3rd</td></tr><tr><td>NCAAF</td><td class="matchup">Coastal Carolina</td><td class="num">+158</td><td class="num">&ndash;</td><td>3rd</td></tr><tr><td>NCAAF</td><td class="matchup">Marshall</td><td class="num">−192</td><td class="num">&ndash;</td><td>3rd</td></tr><tr><td>NCAAF</td><td class="matchup">Nevada</td><td class="num">−400</td><td class="num">−1600</td><td>3rd</td></tr><tr><td>NCAAF</td><td class="matchup">UTEP</td><td class="num">+310</td><td class="num">+750</td><td>3rd</td></tr><tr><td>NCAAF</td><td class="matchup">North Dakota State</td><td class="num">−146</td><td class="num">+132</td><td>3rd</td></tr><tr><td>NCAAF</td><td class="matchup">UNLV</td><td class="num">+122</td><td class="num">−170</td><td>3rd</td></tr><tr><td>NHL</td><td class="matchup">Utah Mammoth</td><td class="num">−115</td><td class="num">&ndash;</td><td>3rd</td></tr><tr><td>NHL</td><td class="matchup">Buffalo Sabres</td><td class="num">−104</td><td class="num">&ndash;</td><td>3rd</td></tr><tr><td>NHL</td><td class="matchup">Carolina Hurricanes</td><td class="num">−260</td><td class="num">&ndash;</td><td>3rd</td></tr><tr><td>NHL</td><td class="matchup">Chicago Blackhawks</td><td class="num">+210</td><td class="num">&ndash;</td><td>3rd</td></tr><tr><td>NHL</td><td class="matchup">Nashville Predators</td><td class="num">+146</td><td class="num">−290</td><td>3rd</td></tr><tr><td>NHL</td><td class="matchup">Ottawa Senators</td><td class="num">−178</td><td class="num">+215</td><td>3rd</td></tr><tr><td>NHL</td><td class="matchup">Dallas Stars</td><td class="num">−178</td><td class="num">+280</td><td>3rd</td></tr><tr><td>NHL</td><td class="matchup">Pittsburgh Penguins</td><td class="num">+146</td><td class="num">−390</td><td>3rd</td></tr><tr><td>NHL</td><td class="matchup">Columbus Blue Jackets</td><td class="num">−102</td><td class="num">−108</td><td>3rd</td></tr><tr><td>NHL</td><td class="matchup">St. Louis Blues</td><td class="num">−118</td><td class="num">−118</td><td>3rd</td></tr><tr><td>NHL</td><td class="matchup">Toronto Maple Leafs</td><td class="num">+180</td><td class="num">−310</td><td>3rd</td></tr><tr><td>NHL</td><td class="matchup">Colorado Avalanche</td><td class="num">−220</td><td class="num">+230</td><td>3rd</td></tr><tr><td>Soccer</td><td class="matchup">DC United</td><td class="num">+600</td><td class="num">&ndash;</td><td>84&#x27; 4-0</td></tr><tr><td>Soccer</td><td class="matchup">Inter Miami CF</td><td class="num">−300</td><td class="num">&ndash;</td><td>84&#x27; 4-0</td></tr><tr><td>NCAAF</td><td class="matchup">Air Force</td><td class="num">−295</td><td class="num">&ndash;</td><td>3rd</td></tr><tr><td>NCAAF</td><td class="matchup">Northern Illinois</td><td class="num">+235</td><td class="num">&ndash;</td><td>3rd</td></tr><tr><td>NCAAF</td><td class="matchup">USC</td><td class="num">−111</td><td class="num">+102</td><td>HT</td></tr><tr><td>NCAAF</td><td class="matchup">Penn State</td><td class="num">−108</td><td class="num">−130</td><td>HT</td></tr><tr><td>Soccer</td><td class="matchup">Seattle Sounders FC</td><td class="num">+210</td><td class="num">−5000</td><td>84&#x27; 0-3</td></tr><tr><td>Soccer</td><td class="matchup">New England Revolution</td><td class="num">+115</td><td class="num">+8000</td><td>84&#x27; 0-3</td></tr><tr><td>NCAAF</td><td class="matchup">Georgia</td><td class="num">+106</td><td class="num">+106</td><td>2nd</td></tr><tr><td>NCAAF</td><td class="matchup">Alabama</td><td class="num">−128</td><td class="num">−136</td><td>2nd</td></tr><tr><td>Soccer</td><td class="matchup">San Diego FC</td><td class="num">+155</td><td class="num">+10000</td><td>82&#x27; 3-1</td></tr><tr><td>Soccer</td><td class="matchup">New York Red Bulls</td><td class="num">+140</td><td class="num">−7000</td><td>82&#x27; 3-1</td></tr><tr><td>NHL</td><td class="matchup">Tampa Bay Lightning</td><td class="num">−176</td><td class="num">−156</td><td>2nd</td></tr><tr><td>NHL</td><td class="matchup">New York Islanders</td><td class="num">+146</td><td class="num">+122</td><td>2nd</td></tr><tr><td>Soccer</td><td class="matchup">Real Salt Lake</td><td class="num">+700</td><td class="num">+4000</td><td>87&#x27; 2-0</td></tr><tr><td>Soccer</td><td class="matchup">Philadelphia Union</td><td class="num">−310</td><td class="num">−900</td><td>87&#x27; 2-0</td></tr><tr><td>NCAAF</td><td class="matchup">Louisiana</td><td class="num">+126</td><td class="num">+176</td><td>3rd</td></tr><tr><td>NCAAF</td><td class="matchup">Louisiana Tech</td><td class="num">−152</td><td class="num">−230</td><td>3rd</td></tr><tr><td>Soccer</td><td class="matchup">FC Cincinnati</td><td class="num">+180</td><td class="num">+430</td><td>89&#x27; 1-2</td></tr><tr><td>Soccer</td><td class="matchup">Atlanta United</td><td class="num">+120</td><td class="num">+330</td><td>89&#x27; 1-2</td></tr><tr><td>NCAAF</td><td class="matchup">Syracuse</td><td class="num">+460</td><td class="num">−170</td><td>HT</td></tr><tr><td>NCAAF</td><td class="matchup">Virginia</td><td class="num">−650</td><td class="num">+132</td><td>HT</td></tr><tr><td>Soccer</td><td class="matchup">FC Dallas</td><td class="num">+210</td><td class="num">+460</td><td>87&#x27; 2-2</td></tr><tr><td>Soccer</td><td class="matchup">Charlotte FC</td><td class="num">+110</td><td class="num">+260</td><td>87&#x27; 2-2</td></tr><tr><td>Soccer</td><td class="matchup">Columbus Crew</td><td class="num">+190</td><td class="num">+270</td><td>86&#x27; 2-2</td></tr><tr><td>Soccer</td><td class="matchup">Orlando City SC</td><td class="num">+120</td><td class="num">+390</td><td>86&#x27; 2-2</td></tr><tr><td>NCAAF</td><td class="matchup">Kansas</td><td class="num">+550</td><td class="num">+1500</td><td>2nd</td></tr><tr><td>NCAAF</td><td class="matchup">Utah</td><td class="num">−820</td><td class="num">−7000</td><td>2nd</td></tr><tr><td>NCAAF</td><td class="matchup">Minnesota</td><td class="num">−144</td><td class="num">+430</td><td>2nd</td></tr><tr><td>NCAAF</td><td class="matchup">Purdue</td><td class="num">+120</td><td class="num">−670</td><td>2nd</td></tr><tr><td>Soccer</td><td class="matchup">Vitória</td><td class="num">+420</td><td class="num">+500</td><td>61&#x27; 1-1</td></tr><tr><td>Soccer</td><td class="matchup">São Paulo</td><td class="num">−145</td><td class="num">+110</td><td>61&#x27; 1-1</td></tr><tr><td>MLB</td><td class="matchup">Chicago White Sox</td><td class="num">+124</td><td class="num">+450</td><td>5th</td></tr><tr><td>MLB</td><td class="matchup">Cleveland Guardians</td><td class="num">−138</td><td class="num">−720</td><td>5th</td></tr><tr><td>Soccer</td><td class="matchup">Melgar</td><td class="num">+360</td><td class="num">−1250</td><td>69&#x27; 0-2</td></tr><tr><td>Soccer</td><td class="matchup">Universitario de Deportes</td><td class="num">−110</td><td class="num">+3500</td><td>69&#x27; 0-2</td></tr><tr><td>NCAAF</td><td class="matchup">James Madison</td><td class="num">−280</td><td class="num">−102</td><td>2nd</td></tr><tr><td>NCAAF</td><td class="matchup">Georgia Southern</td><td class="num">+225</td><td class="num">−125</td><td>2nd</td></tr><tr><td>Soccer</td><td class="matchup">Estudiantes de Río Cuarto</td><td class="num">+1400</td><td class="num">+7500</td><td>HT</td></tr><tr><td>Soccer</td><td class="matchup">River Plate</td><td class="num">−650</td><td class="num">−2500</td><td>HT</td></tr><tr><td>Soccer</td><td class="matchup">Nashville SC</td><td class="num">−160</td><td class="num">−475</td><td>45&#x27; 0-1</td></tr><tr><td>Soccer</td><td class="matchup">Austin FC</td><td class="num">+380</td><td class="num">+1100</td><td>45&#x27; 0-1</td></tr><tr><td>Soccer</td><td class="matchup">Portland Timbers</td><td class="num">+120</td><td class="num">−195</td><td>45&#x27; 0-1</td></tr><tr><td>Soccer</td><td class="matchup">Sporting Kansas City</td><td class="num">+185</td><td class="num">+500</td><td>45&#x27; 0-1</td></tr><tr><td>Soccer</td><td class="matchup">Houston Dynamo</td><td class="num">+230</td><td class="num">−125</td><td>45&#x27; 0-1</td></tr><tr><td>Soccer</td><td class="matchup">Minnesota United</td><td class="num">+110</td><td class="num">+410</td><td>45&#x27; 0-1</td></tr><tr><td>Soccer</td><td class="matchup">Guadalajara Chivas</td><td class="num">+110</td><td class="num">+120</td><td>24&#x27; 0-0</td></tr><tr><td>Soccer</td><td class="matchup">Atlas</td><td class="num">+240</td><td class="num">+250</td><td>24&#x27; 0-0</td></tr></tbody></table></div></section></div><div class="panel" role="tabpanel" data-panel="rules" hidden><section class="card"><div class="card-head"><h2>Results by rule</h2><span class="card-note">Each version of a rule is tracked separately</span></div><div class="scroll"><table><thead><tr><th class="">Rule</th><th class="">Sport</th><th class="num">Bets</th><th class="num">W&ndash;L</th><th class="num">Win rate</th><th class="num">P/L</th><th class="num">ROI</th></tr></thead><tbody><tr><td><div class="rule-id">R001 <span class="muted">v1</span></div><div class="rule-desc" title="NFL: -200 or bigger pregame favorite, bet when live odds reach +100 to +500, not in the last 5 minutes or overtime">NFL: -200 or bigger pregame favorite, bet when live odds reach +100 to +500, not in the last 5 minutes or overtime</div></td><td>NFL</td><td class="num">2</td><td class="num">1&ndash;1</td><td class="num">50.0%</td><td class="num neg">−$0.71</td><td class="num neg">−3.6%</td></tr><tr><td><div class="rule-id">R001 <span class="muted">v2</span></div><div class="rule-desc" title="NFL: -200 or bigger pregame favorite, bet when live odds reach +100 to +500, not in the last 5 minutes or overtime">NFL: -200 or bigger pregame favorite, bet when live odds reach +100 to +500, not in the last 5 minutes or overtime</div></td><td>NFL</td><td class="num">4</td><td class="num">2&ndash;2</td><td class="num">50.0%</td><td class="num neg">−$2.88</td><td class="num neg">−7.4%</td></tr><tr><td><div class="rule-id">R002 <span class="muted">v1</span></div><div class="rule-desc" title="College football: -200 or bigger pregame favorite, bet when live odds reach +100 to +500, not in the last 5 minutes or overtime">College football: -200 or bigger pregame favorite, bet when live odds reach +100 to +500, not in the last 5 minutes or overtime</div></td><td>NCAAF</td><td class="num">10</td><td class="num">6&ndash;4</td><td class="num">60.0%</td><td class="num pos">+$58.25</td><td class="num pos">+59.6%</td></tr><tr><td><div class="rule-id">R002 <span class="muted">v2</span></div><div class="rule-desc" title="College football: -200 or bigger pregame favorite, bet when live odds reach +100 to +500, not in the last 5 minutes or overtime">College football: -200 or bigger pregame favorite, bet when live odds reach +100 to +500, not in the last 5 minutes or overtime</div></td><td>NCAAF</td><td class="num">24</td><td class="num">10&ndash;12</td><td class="num">45.5%</td><td class="num neg">−$21.09</td><td class="num neg">−9.9%</td></tr><tr><td><div class="rule-id">R005 <span class="muted">v1</span></div><div class="rule-desc" title="NHL: -200 or bigger pregame favorite, bet when live odds reach +100 to +500, not in the last 5 minutes or overtime">NHL: -200 or bigger pregame favorite, bet when live odds reach +100 to +500, not in the last 5 minutes or overtime</div></td><td>NHL</td><td class="num">1</td><td class="num">0&ndash;1</td><td class="num">0.0%</td><td class="num neg">−$9.98</td><td class="num neg">−100.0%</td></tr><tr><td><div class="rule-id">R005 <span class="muted">v2</span></div><div class="rule-desc" title="NHL: -200 or bigger pregame favorite, bet when live odds reach +100 to +500, not in the last 5 minutes or overtime">NHL: -200 or bigger pregame favorite, bet when live odds reach +100 to +500, not in the last 5 minutes or overtime</div></td><td>NHL</td><td class="num">5</td><td class="num">2&ndash;2</td><td class="num">50.0%</td><td class="num pos">+$4.90</td><td class="num pos">+12.5%</td></tr><tr><td><div class="rule-id">R006 <span class="muted">v2</span></div><div class="rule-desc" title="Tennis (men&#x27;s and women&#x27;s): -300 or bigger pregame favorite, bet when live odds reach +100 to +500, not once either player has 4 games in the final set">Tennis (men&#x27;s and women&#x27;s): -300 or bigger pregame favorite, bet when live odds reach +100 to +500, not once either player has 4 games in the final set</div></td><td>Tennis</td><td class="num">22</td><td class="num">10&ndash;12</td><td class="num">45.5%</td><td class="num pos">+$0.99</td><td class="num pos">+0.5%</td></tr><tr><td><div class="rule-id">R006S <span class="muted">v1</span></div><div class="rule-desc" title="Suggested by the learner from R006-v2: -150 or bigger pregame favorite, bet when live odds reach +200 to +300">Suggested by the learner from R006-v2: -150 or bigger pregame favorite, bet when live odds reach +200 to +300</div></td><td>Tennis</td><td class="num">4</td><td class="num">2&ndash;2</td><td class="num">50.0%</td><td class="num pos">+$8.53</td><td class="num pos">+21.6%</td></tr><tr><td><div class="rule-id">R006S <span class="muted">v2</span></div><div class="rule-desc" title="Suggested by the learner from R006-v2: -150 or bigger pregame favorite, bet when live odds reach +200 to +300">Suggested by the learner from R006-v2: -150 or bigger pregame favorite, bet when live odds reach +200 to +300</div></td><td>Tennis</td><td class="num">1</td><td class="num">0&ndash;1</td><td class="num">0.0%</td><td class="num neg">−$9.75</td><td class="num neg">−100.0%</td></tr><tr><td><div class="rule-id">R007 <span class="muted">v2</span></div><div class="rule-desc" title="Soccer first half: -200 or bigger pregame favorite (full match), bet on them to lead at halftime when their first-half odds go to +100 while tied or winning, not from the 35th minute on">Soccer first half: -200 or bigger pregame favorite (full match), bet on them to lead at halftime when their first-half odds go to +100 while tied or winning, not from the 35th minute on</div></td><td>Soccer 1st half</td><td class="num">7</td><td class="num">2&ndash;5</td><td class="num">28.6%</td><td class="num neg">−$31.71</td><td class="num neg">−46.8%</td></tr><tr><td><div class="rule-id">R008 <span class="muted">v1</span></div><div class="rule-desc" title="Soccer: -200 or bigger pregame favorite, bet when live odds reach +100 while tied or winning, not after the 70th minute">Soccer: -200 or bigger pregame favorite, bet when live odds reach +100 while tied or winning, not after the 70th minute</div></td><td>Soccer</td><td class="num">7</td><td class="num">4&ndash;3</td><td class="num">57.1%</td><td class="num pos">+$22.63</td><td class="num pos">+33.1%</td></tr><tr><td><div class="rule-id">R014 <span class="muted">v1</span></div><div class="rule-desc" title="NHL: -150 or bigger pregame favorite, down exactly 1 in the 1st period, bet when live odds are +115 to +300. Backtest: down 1 after P1 won 47% (worth it above +113)">NHL: -150 or bigger pregame favorite, down exactly 1 in the 1st period, bet when live odds are +115 to +300. Backtest: down 1 after P1 won 47% (worth it above +113)</div></td><td>NHL</td><td class="num">1</td><td class="num">1&ndash;0</td><td class="num">100.0%</td><td class="num pos">+$21.24</td><td class="num pos">+217.6%</td></tr><tr><td><div class="rule-id">R018 <span class="muted">v1</span></div><div class="rule-desc" title="College football: -300 or bigger pregame favorite, down 1 to 7 in Q2 (game minutes 15-30), bet when live odds are +100 to +300. Backtest 2016-2023: won 43 of 71 (61%)">College football: -300 or bigger pregame favorite, down 1 to 7 in Q2 (game minutes 15-30), bet when live odds are +100 to +300. Backtest 2016-2023: won 43 of 71 (61%)</div></td><td>NCAAF</td><td class="num">3</td><td class="num">1&ndash;1</td><td class="num">50.0%</td><td class="num pos">+$3.53</td><td class="num pos">+18.1%</td></tr></tbody></table></div></section></div><div class="panel" role="tabpanel" data-panel="history" hidden><section class="card" id="history-card"><div class="card-head"><h2>Trade history</h2><span class="card-note" id="history-count"></span></div><div class="filters"><label>Sport<select data-filter="sport"><option value="">All sports</option><option value="NCAAF">NCAAF</option><option value="NFL">NFL</option><option value="NHL">NHL</option><option value="Soccer">Soccer</option><option value="Soccer 1st half">Soccer 1st half</option><option value="Tennis">Tennis</option></select></label><label>Rule<select data-filter="rule"><option value="">All rules</option><option value="R001-v1">R001-v1</option><option value="R001-v2">R001-v2</option><option value="R002-v1">R002-v1</option><option value="R002-v2">R002-v2</option><option value="R005-v1">R005-v1</option><option value="R005-v2">R005-v2</option><option value="R006-v2">R006-v2</option><option value="R006S-v1">R006S-v1</option><option value="R006S-v2">R006S-v2</option><option value="R007-v2">R007-v2</option><option value="R008-v1">R008-v1</option><option value="R014-v1">R014-v1</option><option value="R018-v1">R018-v1</option></select></label><button type="button" class="link-button" id="history-reset">Clear filters</button></div><div class="scroll"><table><thead><tr><th class="">Settled</th><th class="">Team</th><th class="">Sport</th><th class="">Rule</th><th class="num">Pregame &rarr; live</th><th class="num">Price</th><th class="">Result</th><th class="num">P/L</th></tr></thead><tbody id="history-rows"></tbody></table></div><p class="empty" id="history-empty" hidden>No trades match these filters.</p><div class="pager"><button type="button" class="pager-button" id="history-prev">&larr; Previous</button><span id="history-page" class="muted"></span><button type="button" class="pager-button" id="history-next">Next &rarr;</button></div><script type="application/json" id="history-data">[{"date": "Oct 10, 07:33 PM", "team": "Philadelphia Union", "opponent": "vs Real Salt Lake", "sport": "Soccer 1st half", "rule": "R007-v2", "pregame": "\u2212310", "live": "+110", "price": "37\u00a2", "result": "win", "pnl": 15.34}, {"date": "Oct 10, 06:37 PM", "team": "Texas", "opponent": "vs Oklahoma", "sport": "NCAAF", "rule": "R002-v2", "pregame": "\u2212345", "live": "+265", "price": "48\u00a2", "result": "loss", "pnl": -9.95}, {"date": "Oct 10, 06:37 PM", "team": "Tennessee", "opponent": "vs Arkansas", "sport": "NCAAF", "rule": "R002-v2", "pregame": "\u2212630", "live": "+108", "price": "45\u00a2", "result": "win", "pnl": 11.18}, {"date": "Oct 10, 06:23 PM", "team": "Oregon", "opponent": "vs UCLA", "sport": "NCAAF", "rule": "R018-v1", "pregame": "\u2212375", "live": "+102", "price": "55\u00a2", "result": "loss", "pnl": -9.65}, {"date": "Oct 10, 06:23 PM", "team": "Oregon", "opponent": "vs UCLA", "sport": "NCAAF", "rule": "R002-v2", "pregame": "\u2212375", "live": "+102", "price": "55\u00a2", "result": "loss", "pnl": -9.65}, {"date": "Oct 10, 06:03 PM", "team": "Duke", "opponent": "vs Georgia Tech", "sport": "NCAAF", "rule": "R002-v2", "pregame": "\u2212210", "live": "+104", "price": "51\u00a2", "result": "loss", "pnl": -9.5}, {"date": "Oct 10, 05:58 PM", "team": "Toledo", "opponent": "vs Buffalo Bulls", "sport": "NCAAF", "rule": "R002-v2", "pregame": "\u22121400", "live": "+134", "price": "36\u00a2", "result": "loss", "pnl": -9.78}, {"date": "Oct 10, 05:58 PM", "team": "Eastern Michigan", "opponent": "vs Akron", "sport": "NCAAF", "rule": "R002-v2", "pregame": "\u2212210", "live": "+124", "price": "55\u00a2", "result": "win", "pnl": 7.35}, {"date": "Oct 10, 04:54 PM", "team": "Vasco da Gama", "opponent": "vs Remo", "sport": "Soccer 1st half", "rule": "R007-v2", "pregame": "\u2212425", "live": "+125", "price": "33\u00a2", "result": "loss", "pnl": -9.68}, {"date": "Oct 10, 03:43 PM", "team": "Florida", "opponent": "vs South Carolina", "sport": "NCAAF", "rule": "R002-v2", "pregame": "\u2212450", "live": "+158", "price": "37\u00a2", "result": "loss", "pnl": -9.66}, {"date": "Oct 10, 03:01 PM", "team": "FC Twente", "opponent": "vs Fortuna Sittard", "sport": "Soccer", "rule": "R008-v1", "pregame": "\u2212240", "live": "+135", "price": "64\u00a2", "result": "loss", "pnl": -9.85}, {"date": "Oct 10, 02:55 PM", "team": "AFC Ajax", "opponent": "vs NEC Nijmegen", "sport": "Soccer 1st half", "rule": "R007-v2", "pregame": "\u2212350", "live": "+115", "price": "87\u00a2", "result": "loss", "pnl": -9.63}, {"date": "Oct 10, 02:55 PM", "team": "Real Madrid", "opponent": "vs Villarreal", "sport": "Soccer 1st half", "rule": "R007-v2", "pregame": "\u2212300", "live": "+125", "price": "46\u00a2", "result": "loss", "pnl": -9.59}, {"date": "Oct 10, 02:41 PM", "team": "Indiana", "opponent": "vs Nebraska", "sport": "NCAAF", "rule": "R018-v1", "pregame": "\u2212330", "live": "+126", "price": "41\u00a2", "result": "win", "pnl": 13.18}, {"date": "Oct 10, 02:41 PM", "team": "Indiana", "opponent": "vs Nebraska", "sport": "NCAAF", "rule": "R002-v2", "pregame": "\u2212330", "live": "+126", "price": "41\u00a2", "result": "win", "pnl": 13.18}, {"date": "Oct 10, 02:14 PM", "team": "Army", "opponent": "vs Tulane", "sport": "NCAAF", "rule": "R002-v2", "pregame": "\u2212225", "live": "+102", "price": "59\u00a2", "result": "win", "pnl": 6.28}, {"date": "Oct 10, 10:41 AM", "team": "Arsenal", "opponent": "vs Leeds United", "sport": "Soccer", "rule": "R008-v1", "pregame": "\u2212240", "live": "+330", "price": "52\u00a2", "result": "win", "pnl": 8.28}, {"date": "Oct 10, 10:39 AM", "team": "Arsenal", "opponent": "vs Leeds United", "sport": "Soccer 1st half", "rule": "R007-v2", "pregame": "\u2212240", "live": "+110", "price": "39\u00a2", "result": "loss", "pnl": -9.76}, {"date": "Oct 10, 10:34 AM", "team": "TSG Hoffenheim", "opponent": "vs Hamburger SV", "sport": "Soccer", "rule": "R008-v1", "pregame": "\u2212280", "live": "+180", "price": "39\u00a2", "result": "loss", "pnl": -9.76}, {"date": "Oct 10, 04:58 AM", "team": "Tomas Martin Etcheverry", "opponent": "vs Dalibor Svr\u010dina", "sport": "Tennis", "rule": "R006S-v2", "pregame": "\u2212150", "live": "+230", "price": "31\u00a2", "result": "loss", "pnl": -9.75}, {"date": "Oct 09, 02:24 PM", "team": "Borussia Dortmund", "opponent": "vs SV Werder Bremen", "sport": "Soccer 1st half", "rule": "R007-v2", "pregame": "\u2212300", "live": "+100", "price": "42\u00a2", "result": "loss", "pnl": -9.62}, {"date": "Oct 09, 01:54 PM", "team": "PSV Eindhoven", "opponent": "vs SC Heerenveen", "sport": "Soccer 1st half", "rule": "R007-v2", "pregame": "\u2212425", "live": "+130", "price": "88\u00a2", "result": "win", "pnl": 1.23}, {"date": "Oct 07, 04:03 AM", "team": "Toma\u0161 Macha\u010d", "opponent": "vs Zhizhen Zhang", "sport": "Tennis", "rule": "R006S-v1", "pregame": "\u2212245", "live": "+120", "price": "48\u00a2", "result": "win", "pnl": 10.05}, {"date": "Oct 07, 03:28 AM", "team": "Coco Gauff", "opponent": "vs Elise Mertens", "sport": "Tennis", "rule": "R006S-v1", "pregame": "\u2212430", "live": "+140", "price": "19\u00a2", "result": "loss", "pnl": -9.84}, {"date": "Oct 07, 03:28 AM", "team": "Coco Gauff", "opponent": "vs Elise Mertens", "sport": "Tennis", "rule": "R006-v2", "pregame": "\u2212430", "live": "+100", "price": "33\u00a2", "result": "loss", "pnl": -9.68}, {"date": "Oct 07, 01:23 AM", "team": "Arthur Gea", "opponent": "vs Jaime Faria", "sport": "Tennis", "rule": "R006S-v1", "pregame": "\u2212192", "live": "+185", "price": "33\u00a2", "result": "win", "pnl": 18.32}, {"date": "Oct 06, 08:49 PM", "team": "Toronto Maple Leafs", "opponent": "vs Nashville Predators", "sport": "NHL", "rule": "R014-v1", "pregame": "\u2212166", "live": "+122", "price": "30\u00a2", "result": "win", "pnl": 21.24}, {"date": "Oct 06, 04:38 AM", "team": "Dane Sweeny", "opponent": "vs Kimmer Coppejans", "sport": "Tennis", "rule": "R006S-v1", "pregame": "\u2212158", "live": "+180", "price": "28\u00a2", "result": "loss", "pnl": -10.0}, {"date": "Oct 06, 02:48 AM", "team": "Michael Zheng", "opponent": "vs Nicolas Mejia", "sport": "Tennis", "rule": "R006-v2", "pregame": "\u2212520", "live": "+140", "price": "20\u00a2", "result": "loss", "pnl": -9.93}, {"date": "Oct 06, 12:42 AM", "team": "Linda Noskova", "opponent": "vs Ekaterina Alexandrova", "sport": "Tennis", "rule": "R006-v2", "pregame": "\u2212350", "live": "+115", "price": "39\u00a2", "result": "loss", "pnl": -9.76}, {"date": "Oct 05, 08:48 AM", "team": "Mattia Bellucci", "opponent": "vs Elias Ymer", "sport": "Tennis", "rule": "R006-v2", "pregame": "\u2212670", "live": "+110", "price": "50\u00a2", "result": "win", "pnl": 9.16}, {"date": "Oct 05, 08:02 AM", "team": "Nishesh Basavareddy", "opponent": "vs Kimmer Coppejans", "sport": "Tennis", "rule": "R006-v2", "pregame": "\u2212770", "live": "+105", "price": "45\u00a2", "result": "loss", "pnl": -9.82}, {"date": "Oct 05, 06:17 AM", "team": "Dalibor Svr\u010dina", "opponent": "vs Billy Harris", "sport": "Tennis", "rule": "R006-v2", "pregame": "\u2212310", "live": "+100", "price": "55\u00a2", "result": "win", "pnl": 7.27}, {"date": "Oct 05, 03:12 AM", "team": "Terence Atmane", "opponent": "vs Bernard Tomi\u0107", "sport": "Tennis", "rule": "R006-v2", "pregame": "\u2212305", "live": "+105", "price": "43\u00a2", "result": "loss", "pnl": -9.84}, {"date": "Oct 05, 01:47 AM", "team": "Lorenzo Sonego", "opponent": "vs Aziz Dougaz", "sport": "Tennis", "rule": "R006-v2", "pregame": "\u2212460", "live": "+110", "price": "45\u00a2", "result": "loss", "pnl": -9.82}, {"date": "Oct 05, 12:58 AM", "team": "Iga Swiatek", "opponent": "vs Donna Veki\u0107", "sport": "Tennis", "rule": "R006-v2", "pregame": "\u2212950", "live": "+120", "price": "36\u00a2", "result": "win", "pnl": 16.27}, {"date": "Oct 04, 10:48 PM", "team": "Detroit Lions", "opponent": "vs Carolina Panthers", "sport": "NFL", "rule": "R001-v2", "pregame": "\u2212225", "live": "+128", "price": "44\u00a2", "result": "loss", "pnl": -9.61}, {"date": "Oct 04, 06:52 PM", "team": "Kansas City Chiefs", "opponent": "vs Las Vegas Raiders", "sport": "NFL", "rule": "R001-v2", "pregame": "\u2212235", "live": "+104", "price": "54\u00a2", "result": "win", "pnl": 7.52}, {"date": "Oct 04, 03:16 PM", "team": "Buffalo Bills", "opponent": "vs New England Patriots", "sport": "NFL", "rule": "R001-v2", "pregame": "\u2212350", "live": "+122", "price": "48\u00a2", "result": "loss", "pnl": -9.95}, {"date": "Oct 04, 01:28 PM", "team": "CD Castell\u00f3n", "opponent": "vs AD Ceuta", "sport": "Soccer", "rule": "R008-v1", "pregame": "\u2212450", "live": "+100", "price": "48\u00a2", "result": "loss", "pnl": -9.95}, {"date": "Oct 04, 11:46 AM", "team": "Indianapolis Colts", "opponent": "vs Washington Commanders", "sport": "NFL", "rule": "R001-v2", "pregame": "\u2212225", "live": "+102", "price": "50\u00a2", "result": "win", "pnl": 9.16}, {"date": "Oct 04, 11:33 AM", "team": "Karolina Muchova", "opponent": "vs Liudmila Samsonova", "sport": "Tennis", "rule": "R006-v2", "pregame": "\u2212400", "live": "+120", "price": "50\u00a2", "result": "win", "pnl": 9.16}, {"date": "Oct 04, 04:33 AM", "team": "Arthur Fils", "opponent": "vs Valentin Vacherot", "sport": "Tennis", "rule": "R006-v2", "pregame": "\u2212440", "live": "+130", "price": "43\u00a2", "result": "loss", "pnl": -9.84}, {"date": "Oct 04, 01:23 AM", "team": "Texas State", "opponent": "vs San Diego State", "sport": "NCAAF", "rule": "R002-v2", "pregame": "\u2212345", "live": "+112", "price": "43\u00a2", "result": "loss", "pnl": -9.84}, {"date": "Oct 03, 11:46 PM", "team": "Aryna Sabalenka", "opponent": "vs Nikola Bartunkova", "sport": "Tennis", "rule": "R006-v2", "pregame": "\u2212820", "live": "+100", "price": "60\u00a2", "result": "loss", "pnl": -9.87}, {"date": "Oct 03, 10:13 PM", "team": "USC", "opponent": "vs Washington", "sport": "NCAAF", "rule": "R002-v2", "pregame": "\u2212295", "live": "+144", "price": "38\u00a2", "result": "win", "pnl": 15.08}, {"date": "Oct 03, 10:03 PM", "team": "Louisiana", "opponent": "vs Arkansas State", "sport": "NCAAF", "rule": "R002-v2", "pregame": "\u2212205", "live": "+122", "price": "54\u00a2", "result": "win", "pnl": 7.52}, {"date": "Oct 03, 09:52 PM", "team": "Minnesota Wild", "opponent": "vs Boston Bruins", "sport": "NHL", "rule": "R005-v2", "pregame": "\u2212215", "live": "+100", "price": "46\u00a2", "result": "win", "pnl": 10.45}, {"date": "Oct 03, 09:48 PM", "team": "South Florida", "opponent": "vs Temple", "sport": "NCAAF", "rule": "R002-v2", "pregame": "\u2212215", "live": "+132", "price": "40\u00a2", "result": "loss", "pnl": -9.59}, {"date": "Oct 03, 08:42 PM", "team": "Buffalo Sabres", "opponent": "vs Chicago Blackhawks", "sport": "NHL", "rule": "R005-v2", "pregame": "\u2212245", "live": "+158", "price": "39\u00a2", "result": "win", "pnl": 14.24}, {"date": "Oct 03, 07:04 PM", "team": "Nebraska", "opponent": "vs Maryland", "sport": "NCAAF", "rule": "R002-v2", "pregame": "\u2212670", "live": "+120", "price": "71\u00a2", "result": "win", "pnl": 3.58}, {"date": "Oct 03, 06:33 PM", "team": "Illinois", "opponent": "vs Purdue", "sport": "NCAAF", "rule": "R002-v2", "pregame": "\u2212360", "live": "+104", "price": "43\u00a2", "result": "loss", "pnl": -9.84}, {"date": "Oct 03, 06:08 PM", "team": "Tennessee", "opponent": "vs Auburn", "sport": "NCAAF", "rule": "R002-v2", "pregame": "\u2212235", "live": "+102", "price": "50\u00a2", "result": "win", "pnl": 9.16}, {"date": "Oct 03, 06:08 PM", "team": "Louisville", "opponent": "vs NC State", "sport": "NCAAF", "rule": "R002-v2", "pregame": "\u2212215", "live": "+104", "price": "43\u00a2", "result": "loss", "pnl": -9.84}, {"date": "Oct 03, 05:48 PM", "team": "Miami (OH)", "opponent": "vs Bowling Green", "sport": "NCAAF", "rule": "R002-v2", "pregame": "\u2212450", "live": "+100", "price": "58\u00a2", "result": "loss", "pnl": -9.56}, {"date": "Oct 03, 05:44 PM", "team": "UMass", "opponent": "vs Eastern Michigan", "sport": "NCAAF", "rule": "R002-v2", "pregame": "\u2212225", "live": "+106", "price": "48\u00a2", "result": "loss", "pnl": -9.95}, {"date": "Oct 03, 04:03 PM", "team": "Rionegro \u00c1guilas Doradas", "opponent": "vs Jaguares de C\u00f3rdoba", "sport": "Soccer", "rule": "R008-v1", "pregame": "\u2212210", "live": "+110", "price": "40\u00a2", "result": "win", "pnl": 13.41}, {"date": "Oct 03, 03:13 PM", "team": "Western Michigan", "opponent": "vs Buffalo Bulls", "sport": "NCAAF", "rule": "R002-v2", "pregame": "\u2212550", "live": "+104", "price": "45\u00a2", "result": "win", "pnl": 11.21}, {"date": "Oct 03, 02:39 PM", "team": "Houston", "opponent": "vs UCF", "sport": "NCAAF", "rule": "R002-v2", "pregame": "\u2212410", "live": "+108", "price": "45\u00a2", "result": "win", "pnl": 11.18}, {"date": "Oct 03, 02:28 PM", "team": "Michigan", "opponent": "vs Minnesota", "sport": "NCAAF", "rule": "R002-v2", "pregame": "\u2212225", "live": "+102", "price": "49\u00a2", "result": "loss", "pnl": -9.65}, {"date": "Oct 03, 11:16 AM", "team": "Almer\u00eda", "opponent": "vs Burgos Club de F\u00fatbol", "sport": "Soccer", "rule": "R008-v1", "pregame": "\u2212210", "live": "+240", "price": "31\u00a2", "result": "win", "pnl": 20.25}, {"date": "Oct 03, 05:08 AM", "team": "Leylah Fernandez", "opponent": "vs Kamilla Rakhimova", "sport": "Tennis", "rule": "R006-v2", "pregame": "\u2212350", "live": "+100", "price": "45\u00a2", "result": "loss", "pnl": -9.82}, {"date": "Oct 03, 03:27 AM", "team": "Elina Svitolina", "opponent": "vs Katerina Siniakova", "sport": "Tennis", "rule": "R006-v2", "pregame": "\u2212400", "live": "+115", "price": "42\u00a2", "result": "win", "pnl": 12.38}, {"date": "Oct 03, 01:02 AM", "team": "Alex de Minaur", "opponent": "vs Quentin Halys", "sport": "Tennis", "rule": "R006-v2", "pregame": "\u2212300", "live": "+100", "price": "42\u00a2", "result": "win", "pnl": 12.38}, {"date": "Oct 02, 11:45 PM", "team": "Vegas Golden Knights", "opponent": "vs Anaheim Ducks", "sport": "NHL", "rule": "R005-v2", "pregame": "\u2212210", "live": "+100", "price": "48\u00a2", "result": "loss", "pnl": -9.95}, {"date": "Oct 02, 10:30 PM", "team": "Deportivo Cali", "opponent": "vs Alianza Valledupar FC", "sport": "Soccer", "rule": "R008-v1", "pregame": "\u2212230", "live": "+100", "price": "47\u00a2", "result": "win", "pnl": 10.25}, {"date": "Oct 02, 10:39 AM", "team": "Novak Djokovic", "opponent": "vs Yunchaokete Bu", "sport": "Tennis", "rule": "R006-v2", "pregame": "\u2212430", "live": "+105", "price": "40\u00a2", "result": "win", "pnl": 13.41}, {"date": "Oct 02, 12:54 AM", "team": "Liudmila Samsonova", "opponent": "vs Linda Fruhvirtova", "sport": "Tennis", "rule": "R006-v2", "pregame": "\u2212520", "live": "+135", "price": "31\u00a2", "result": "win", "pnl": 20.25}, {"date": "Oct 01, 06:47 AM", "team": "Rafael Jodar", "opponent": "vs Adolfo Daniel Vallejo", "sport": "Tennis", "rule": "R006-v2", "pregame": "\u2212480", "live": "+115", "price": "41\u00a2", "result": "loss", "pnl": -9.82}, {"date": "Oct 01, 12:53 AM", "team": "Stefanos Tsitsipas", "opponent": "vs Tomas Martin Etcheverry", "sport": "Tennis", "rule": "R006-v2", "pregame": "\u2212330", "live": "+100", "price": "50\u00a2", "result": "win", "pnl": 9.16}, {"date": "Oct 01, 12:12 AM", "team": "Taylor Fritz", "opponent": "vs Jaume Munar", "sport": "Tennis", "rule": "R006-v2", "pregame": "\u2212320", "live": "+105", "price": "40\u00a2", "result": "loss", "pnl": -9.59}, {"date": "Sep 30, 02:13 AM", "team": "Daria Snigur", "opponent": "vs Katarzyna Kawa", "sport": "Tennis", "rule": "R006-v2", "pregame": "\u2212820", "live": "+145", "price": "50\u00a2", "result": "win", "pnl": 9.16}, {"date": "Sep 30, 12:37 AM", "team": "Maya Joint", "opponent": "vs Sinja Kraus", "sport": "Tennis", "rule": "R006-v2", "pregame": "\u2212330", "live": "+100", "price": "41\u00a2", "result": "loss", "pnl": -9.82}, {"date": "Sep 29, 11:54 PM", "team": "Edmonton Oilers", "opponent": "vs Vancouver Canucks", "sport": "NHL", "rule": "R005-v2", "pregame": "\u2212310", "live": "+102", "price": "50\u00a2", "result": "loss", "pnl": -9.84}, {"date": "Sep 27, 03:32 PM", "team": "Seattle Seahawks", "opponent": "vs Washington Commanders", "sport": "NFL", "rule": "R001-v1", "pregame": "\u2212420", "live": "+104", "price": "60\u00a2", "result": "loss", "pnl": -9.87}, {"date": "Sep 27, 03:16 PM", "team": "Buffalo Bills", "opponent": "vs Los Angeles Chargers", "sport": "NFL", "rule": "R001-v1", "pregame": "\u2212375", "live": "+124", "price": "50\u00a2", "result": "win", "pnl": 9.16}, {"date": "Sep 27, 01:48 AM", "team": "Washington", "opponent": "vs Minnesota", "sport": "NCAAF", "rule": "R002-v1", "pregame": "\u2212490", "live": "+140", "price": "52\u00a2", "result": "loss", "pnl": -9.68}, {"date": "Sep 27, 01:22 AM", "team": "Air Force", "opponent": "vs Nevada", "sport": "NCAAF", "rule": "R002-v1", "pregame": "\u2212225", "live": "+106", "price": "39\u00a2", "result": "win", "pnl": 14.24}, {"date": "Sep 26, 10:35 PM", "team": "Arizona", "opponent": "vs Washington State", "sport": "NCAAF", "rule": "R002-v1", "pregame": "\u2212465", "live": "+154", "price": "45\u00a2", "result": "win", "pnl": 11.18}, {"date": "Sep 26, 09:57 PM", "team": "Kansas State", "opponent": "vs Cincinnati", "sport": "NCAAF", "rule": "R002-v1", "pregame": "\u2212240", "live": "+100", "price": "37\u00a2", "result": "loss", "pnl": -9.66}, {"date": "Sep 26, 09:52 PM", "team": "Tulane", "opponent": "vs Southern Miss", "sport": "NCAAF", "rule": "R002-v1", "pregame": "\u22121200", "live": "+132", "price": "50\u00a2", "result": "win", "pnl": 9.16}, {"date": "Sep 26, 09:11 PM", "team": "Philadelphia Flyers", "opponent": "vs Washington Capitals", "sport": "NHL", "rule": "R005-v1", "pregame": "\u2212320", "live": "+255", "price": "29\u00a2", "result": "loss", "pnl": -9.98}, {"date": "Sep 26, 09:08 PM", "team": "Arkansas State", "opponent": "vs Kennesaw State", "sport": "NCAAF", "rule": "R002-v1", "pregame": "\u2212240", "live": "+158", "price": "38\u00a2", "result": "win", "pnl": 15.08}, {"date": "Sep 26, 07:45 PM", "team": "Penn State", "opponent": "vs Wisconsin", "sport": "NCAAF", "rule": "R002-v1", "pregame": "\u2212400", "live": "+400", "price": "22\u00a2", "result": "loss", "pnl": -9.98}, {"date": "Sep 26, 06:17 PM", "team": "Marshall", "opponent": "vs Gardner-Webb", "sport": "NCAAF", "rule": "R002-v1", "pregame": "\u22124000", "live": "+190", "price": "33\u00a2", "result": "win", "pnl": 18.32}, {"date": "Sep 26, 02:53 PM", "team": "Louisville", "opponent": "vs Wake Forest", "sport": "NCAAF", "rule": "R002-v1", "pregame": "\u2212450", "live": "+122", "price": "46\u00a2", "result": "loss", "pnl": -9.55}, {"date": "Sep 26, 02:43 PM", "team": "Virginia Tech", "opponent": "vs Boston College", "sport": "NCAAF", "rule": "R002-v1", "pregame": "\u2212800", "live": "+300", "price": "24\u00a2", "result": "win", "pnl": 29.14}]</script></section></div></div><footer><span class="footer-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg></span><div><p><strong>Paper trading:</strong> every bet here is simulated with no real money. Rules trigger on live sportsbook odds; each bet is priced from the real Kalshi order book at that moment, including fees, and settled from Kalshi&rsquo;s official result.</p><p class="muted">Updated Oct 10, 08:29 PM CDT. The page refreshes itself every minute.</p></div></footer></main><script>
+(function () {
+  // Status pill: "live" if this page was built in the last 15 minutes
+  var status = document.getElementById("status");
+  if (status) {
+    var ageMinutes = (Date.now() - new Date(status.dataset.updated).getTime()) / 60000;
+    if (ageMinutes < 15) {
+      status.classList.add("live");
+    } else {
+      var hours = ageMinutes / 60;
+      document.getElementById("status-text").textContent = "Last update " +
+        (hours < 1 ? Math.round(ageMinutes) + " min ago" :
+         hours < 48 ? Math.round(hours) + " hours ago" : Math.round(hours / 24) + " days ago");
+    }
+  }
+
+  var NS = "http://www.w3.org/2000/svg";
+  var MINUS = "\u2212";
+
+  function money(v, signed) {
+    var s = "$" + Math.abs(v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    if (v < 0) return MINUS + s;
+    return (signed && v > 0 ? "+" : "") + s;
+  }
+  function axisMoney(v) {
+    var s = "$" + Math.abs(v).toLocaleString(undefined, {maximumFractionDigits: 0});
+    return v < 0 ? MINUS + s : s;
+  }
+  function el(name, attrs, parent) {
+    var node = document.createElementNS(NS, name);
+    for (var key in attrs) node.setAttribute(key, attrs[key]);
+    if (parent) parent.appendChild(node);
+    return node;
+  }
+  function niceStep(range, count) {
+    var raw = range / count;
+    var power = Math.pow(10, Math.floor(Math.log10(raw)));
+    var unit = raw / power;
+    return (unit <= 1 ? 1 : unit <= 2 ? 2 : unit <= 5 ? 5 : 10) * power;
+  }
+  function readJson(id) {
+    var node = document.getElementById(id);
+    return node ? JSON.parse(node.textContent) : null;
+  }
+  function store(key, value) {
+    try { sessionStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+  }
+  function recall(key) {
+    try { return JSON.parse(sessionStorage.getItem(key)); } catch (e) { return null; }
+  }
+
+  // ===== Cumulative P/L chart (one per tab) =====
+
+  function makeChart(holder) {
+    var points = readJson(holder.dataset.source);
+    var tip = holder.querySelector(".tooltip");
+    var active = null;
+    var layout = null;
+
+    function draw() {
+      var width = holder.clientWidth, height = holder.clientHeight;
+      if (!width) return;  // inside a hidden tab; drawn when it's shown
+
+      var old = holder.querySelector("svg");
+      if (old) old.remove();
+
+      var m = {top: 12, right: 64, bottom: 28, left: 56};
+      var plotW = width - m.left - m.right, plotH = height - m.top - m.bottom;
+
+      var times = points.map(function (p) { return new Date(p.t).getTime(); });
+      var t0 = times[0], t1 = times[times.length - 1];
+      if (t1 === t0) t1 = t0 + 3600000;
+
+      var values = points.map(function (p) { return p.cum; });
+      var lo = Math.min(0, Math.min.apply(null, values));
+      var hi = Math.max(0, Math.max.apply(null, values));
+      var step = niceStep((hi - lo) || 10, 4);
+      lo = Math.floor(lo / step) * step;
+      hi = Math.ceil(hi / step) * step;
+      if (hi === lo) hi = lo + step;
+
+      function x(t) { return m.left + (t - t0) / (t1 - t0) * plotW; }
+      function y(v) { return m.top + (hi - v) / (hi - lo) * plotH; }
+
+      var svg = el("svg", {viewBox: "0 0 " + width + " " + height, role: "img"});
+      holder.insertBefore(svg, tip);
+
+      var css = getComputedStyle(document.documentElement);
+      var gridColor = css.getPropertyValue("--grid").trim();
+      var axisColor = css.getPropertyValue("--axis").trim();
+      var accent = css.getPropertyValue("--accent").trim();
+      // Fill under the line fades from the accent color to nothing
+      var fillId = "fill-" + holder.dataset.source;
+      var defs = el("defs", {}, svg);
+      var gradient = el("linearGradient", {id: fillId, x1: 0, y1: 0, x2: 0, y2: 1}, defs);
+      el("stop", {offset: "0%", "stop-color": accent, "stop-opacity": 0.22}, gradient);
+      el("stop", {offset: "100%", "stop-color": accent, "stop-opacity": 0.02}, gradient);
+      var surface = css.getPropertyValue("--surface").trim();
+
+      // Gridlines and y-axis labels ($0 gets the stronger baseline)
+      for (var v = lo; v <= hi + step / 2; v += step) {
+        var zero = Math.abs(v) < step / 1000;
+        el("line", {x1: m.left, x2: m.left + plotW, y1: y(v), y2: y(v),
+          stroke: zero ? axisColor : gridColor, "stroke-width": 1}, svg);
+        var label = el("text", {x: m.left - 10, y: y(v) + 4, "text-anchor": "end"}, svg);
+        label.textContent = axisMoney(zero ? 0 : v);
+      }
+
+      // X-axis date labels
+      var ticks = Math.max(2, Math.min(5, Math.floor(plotW / 140)));
+      for (var i = 0; i < ticks; i++) {
+        var t = t0 + (t1 - t0) * i / (ticks - 1);
+        var tx = el("text", {x: x(t), y: height - 6,
+          "text-anchor": i === 0 ? "start" : i === ticks - 1 ? "end" : "middle"}, svg);
+        tx.textContent = new Date(t).toLocaleDateString(undefined, {month: "short", day: "numeric"});
+      }
+
+      // Area fill down to $0, then the line
+      var line = points.map(function (p, i) {
+        return (i ? "L" : "M") + x(times[i]).toFixed(1) + "," + y(p.cum).toFixed(1);
+      }).join("");
+      el("path", {d: line + "L" + x(times[times.length - 1]).toFixed(1) + "," + y(0) +
+        "L" + x(times[0]).toFixed(1) + "," + y(0) + "Z", fill: "url(#" + fillId + ")"}, svg);
+      el("path", {d: line, fill: "none", stroke: accent, "stroke-width": 2,
+        "stroke-linejoin": "round", "stroke-linecap": "round"}, svg);
+
+      // End point and its value
+      var last = points[points.length - 1];
+      var lx = x(times[times.length - 1]), ly = y(last.cum);
+      el("circle", {cx: lx, cy: ly, r: 4, fill: accent, stroke: surface, "stroke-width": 2}, svg);
+      var end = el("text", {x: lx + 10, y: ly + 4, "class": "end-label"}, svg);
+      end.textContent = money(last.cum, true);
+
+      // Hover layer: crosshair + dot
+      var cross = el("line", {y1: m.top, y2: m.top + plotH, stroke: axisColor, "stroke-width": 1, visibility: "hidden"}, svg);
+      var dot = el("circle", {r: 4, fill: accent, stroke: surface, "stroke-width": 2, visibility: "hidden"}, svg);
+
+      layout = {x: x, y: y, times: times, cross: cross, dot: dot};
+      if (active !== null) show(active);
+    }
+
+    function show(index) {
+      if (!layout) return;
+      active = index;
+      var p = points[index];
+      var px = layout.x(layout.times[index]), py = layout.y(p.cum);
+      layout.cross.setAttribute("x1", px); layout.cross.setAttribute("x2", px);
+      layout.cross.setAttribute("visibility", "visible");
+      layout.dot.setAttribute("cx", px); layout.dot.setAttribute("cy", py);
+      layout.dot.setAttribute("visibility", "visible");
+
+      tip.textContent = "";
+      function row(cls, text, key) {
+        var d = document.createElement("div");
+        d.className = cls;
+        if (key) { var k = document.createElement("span"); k.className = "tip-key"; d.appendChild(k); }
+        d.appendChild(document.createTextNode(text));
+        tip.appendChild(d);
+      }
+      row("tip-value", money(p.cum, true), true);
+      row("tip-line", p.bet + " " + money(p.pnl, true));
+      row("tip-date", p.date);
+      tip.hidden = false;
+
+      var left = px + 14;
+      if (left + tip.offsetWidth > holder.clientWidth) left = px - tip.offsetWidth - 14;
+      tip.style.left = Math.max(0, left) + "px";
+      tip.style.top = Math.max(0, py - tip.offsetHeight / 2) + "px";
+    }
+
+    function hide() {
+      active = null;
+      tip.hidden = true;
+      if (!layout) return;
+      layout.cross.setAttribute("visibility", "hidden");
+      layout.dot.setAttribute("visibility", "hidden");
+    }
+
+    function nearest(clientX) {
+      var rect = holder.getBoundingClientRect();
+      var mx = clientX - rect.left, best = 0, bestGap = Infinity;
+      for (var i = 0; i < points.length; i++) {
+        var gap = Math.abs(layout.x(layout.times[i]) - mx);
+        if (gap < bestGap) { bestGap = gap; best = i; }
+      }
+      return best;
+    }
+
+    holder.addEventListener("pointermove", function (e) { if (layout) show(nearest(e.clientX)); });
+    holder.addEventListener("pointerleave", hide);
+    holder.addEventListener("blur", hide);
+    holder.addEventListener("keydown", function (e) {
+      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+      e.preventDefault();
+      var i = active === null ? points.length - 1 : active + (e.key === "ArrowRight" ? 1 : -1);
+      show(Math.max(0, Math.min(points.length - 1, i)));
+    });
+
+    return {draw: draw};
+  }
+
+  var charts = Array.prototype.map.call(document.querySelectorAll(".chart[data-source]"), makeChart);
+
+  function drawCharts() {
+    charts.forEach(function (chart) { chart.draw(); });
+  }
+
+  // ===== Trade history: filters + 10 per page =====
+  // Filters and page are remembered for this browser tab, so the page's
+  // automatic refresh doesn't reset them.
+
+  var trades = readJson("history-data");
+  var PAGE_SIZE = 10;
+
+  if (trades) {
+    var filters = document.querySelectorAll("#history-card select[data-filter]");
+    var body = document.getElementById("history-rows");
+    var empty = document.getElementById("history-empty");
+    var count = document.getElementById("history-count");
+    var pageLabel = document.getElementById("history-page");
+    var prev = document.getElementById("history-prev");
+    var next = document.getElementById("history-next");
+    var saved = recall("history") || {};
+    var page = saved.page || 1;
+
+    filters.forEach(function (select) {
+      var value = (saved.filters || {})[select.dataset.filter];
+      if (value && select.querySelector('option[value="' + CSS.escape(value) + '"]')) select.value = value;
+    });
+
+    function cell(row, text, cls) {
+      var td = document.createElement("td");
+      if (cls) td.className = cls;
+      td.textContent = text;
+      row.appendChild(td);
+      return td;
+    }
+
+    function renderHistory() {
+      var chosen = {};
+      filters.forEach(function (select) { chosen[select.dataset.filter] = select.value; });
+
+      var matching = trades.filter(function (trade) {
+        return Object.keys(chosen).every(function (key) {
+          return !chosen[key] || trade[key] === chosen[key];
+        });
+      });
+
+      var pages = Math.max(1, Math.ceil(matching.length / PAGE_SIZE));
+      page = Math.min(Math.max(1, page), pages);
+      store("history", {filters: chosen, page: page});
+
+      var start = (page - 1) * PAGE_SIZE;
+      var shown = matching.slice(start, start + PAGE_SIZE);
+
+      body.textContent = "";
+      shown.forEach(function (trade) {
+        var row = document.createElement("tr");
+
+        var teamCell = document.createElement("td");
+        var team = document.createElement("div");
+        team.className = "matchup";
+        team.textContent = trade.team;
+        var opponent = document.createElement("div");
+        opponent.className = "muted small";
+        opponent.textContent = trade.opponent;
+        teamCell.appendChild(team);
+        teamCell.appendChild(opponent);
+
+        cell(row, trade.date);
+        row.appendChild(teamCell);
+        cell(row, trade.sport);
+        cell(row, trade.rule);
+        cell(row, trade.pregame + " \u2192 " + trade.live, "num");
+        cell(row, trade.price, "num");
+
+        var resultCell = document.createElement("td");
+        var badge = document.createElement("span");
+        badge.className = "badge " + trade.result;
+        var icon = document.createElement("span");
+        icon.setAttribute("aria-hidden", "true");
+        icon.textContent = trade.result === "win" ? "\u2713" : trade.result === "loss" ? "\u2715" : "\u2013";
+        badge.appendChild(icon);
+        badge.appendChild(document.createTextNode(" " + trade.result.charAt(0).toUpperCase() + trade.result.slice(1)));
+        resultCell.appendChild(badge);
+        row.appendChild(resultCell);
+
+        cell(row, money(trade.pnl, true), "num " + (trade.pnl > 0 ? "pos" : trade.pnl < 0 ? "neg" : ""));
+        body.appendChild(row);
+      });
+
+      empty.hidden = matching.length > 0;
+      count.textContent = matching.length
+        ? "Showing " + (start + 1) + "\u2013" + (start + shown.length) + " of " + matching.length + " trades"
+        : "";
+      pageLabel.textContent = "Page " + page + " of " + pages;
+      prev.disabled = page <= 1;
+      next.disabled = page >= pages;
+    }
+
+    filters.forEach(function (select) {
+      select.addEventListener("change", function () { page = 1; renderHistory(); });
+    });
+    prev.addEventListener("click", function () { page -= 1; renderHistory(); });
+    next.addEventListener("click", function () { page += 1; renderHistory(); });
+    document.getElementById("history-reset").addEventListener("click", function () {
+      filters.forEach(function (select) { select.value = ""; });
+      page = 1;
+      renderHistory();
+    });
+
+    renderHistory();
+  }
+
+  // ===== Tabs =====
+  // Each tab bar controls the panels next to it. The open tabs are kept
+  // in the address (e.g. #history) so the page's automatic
+  // refresh comes back to the same place.
+
+  function panelsFor(bar) {
+    return Array.prototype.slice.call(document.getElementById(bar.dataset.panels).children);
+  }
+
+  function openPanel(bar) {
+    return panelsFor(bar).filter(function (panel) { return !panel.hidden; })[0];
+  }
+
+  function childBar(panel) {
+    return panel ? panel.querySelector("nav.subtabs") : null;
+  }
+
+  function select(button) {
+    var bar = button.parentNode;
+    bar.querySelectorAll(".tab").forEach(function (tab) {
+      tab.setAttribute("aria-selected", tab === button ? "true" : "false");
+      tab.tabIndex = tab === button ? 0 : -1;
+    });
+    panelsFor(bar).forEach(function (panel) {
+      panel.hidden = panel.dataset.panel !== button.dataset.tab;
+    });
+    drawCharts();
+  }
+
+  function currentPath() {
+    var path = [];
+    for (var bar = document.querySelector("nav.tabs"); bar; bar = childBar(openPanel(bar))) {
+      path.push(bar.querySelector('.tab[aria-selected="true"]').dataset.tab);
+    }
+    return path.join("/");
+  }
+
+  document.querySelectorAll('[role="tablist"]').forEach(function (bar) {
+    var tabs = Array.prototype.slice.call(bar.querySelectorAll(".tab"));
+
+    tabs.forEach(function (tab, index) {
+      tab.tabIndex = tab.getAttribute("aria-selected") === "true" ? 0 : -1;
+
+      tab.addEventListener("click", function () {
+        select(tab);
+        history.replaceState(null, "", "#" + currentPath());
+      });
+
+      // Arrow keys move between tabs
+      tab.addEventListener("keydown", function (e) {
+        var step = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+        if (!step) return;
+        e.preventDefault();
+        var target = tabs[(index + step + tabs.length) % tabs.length];
+        target.focus();
+        target.click();
+      });
+    });
+  });
+
+  // Reopen the tabs named in the address, if any
+  var bar = document.querySelector("nav.tabs");
+  location.hash.replace("#", "").split("/").forEach(function (key) {
+    if (!bar || !key) return;
+    var tab = bar.querySelector('.tab[data-tab="' + key.replace(/[^a-z0-9_-]/gi, "") + '"]');
+    if (!tab) return;
+    select(tab);
+    bar = childBar(openPanel(bar));
+  });
+
+  drawCharts();
+  window.addEventListener("resize", drawCharts);
+  if (window.matchMedia) window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", drawCharts);
+})();
+</script>
+</body></html>
