@@ -1,0 +1,32 @@
+# Publishes index.html to GitHub Pages every time the bot uploads it.
+# Publishing through Actions avoids the classic Pages limit of about
+# 10 builds per hour, so the site can update as often as the bot does.
+name: Publish results
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# If a newer upload arrives while one is publishing, skip to the newest
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deployment
+        uses: actions/deploy-pages@v4
